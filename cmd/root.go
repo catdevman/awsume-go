@@ -41,10 +41,12 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-
-	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config-file", "", "config file (default is $HOME/.awsume/config.yaml)")
+	home, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
 	logger := log.Default()
-	pluginFiles, err := filepath.Glob("./plugins/*.so") // config directory plugins and local plugins in the future
+	pluginFiles, err := filepath.Glob(home + string(os.PathSeparator) + ".awsume" + string(os.PathSeparator) + "plugins" + string(os.PathSeparator) + "*.so") // config directory plugins and local plugins in the future
 	if err != nil {
 		panic(err)
 	}
