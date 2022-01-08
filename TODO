@@ -12,7 +12,7 @@
   - Run all post collect profiles hooks
 - Get Credentials(args, profiles)
   - Run all pre get creds
-  - Check args for auto_refreshi and arg.json, with_saml, with_web_identity, or else
+  - Check args for auto_refresh and arg.json, with_saml, with_web_identity, or else
     - Pull credentials from 'Credentials'
     - Run get saml credentials
     - Run all get credentials with web identity hooks

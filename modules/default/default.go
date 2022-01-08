@@ -1,15 +1,15 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
-const (
-	ModuleName = "default"
-)
-
 type ModuleStruct struct {
-	Cmd *cobra.Command
+	Cmd  *cobra.Command
+	Name string "default"
 }
 
 var versionFlag bool
@@ -30,6 +30,8 @@ var mfaTokenFlag string
 var regionFlag string
 var sessionNameFlag string
 var roleDurationFlag int64
+var withSamlFlag bool
+var withWebIdentityFlag bool
 var jsonFlag string
 var credentialsFileFlag string
 var configFileFlag string
@@ -41,8 +43,12 @@ func New(c *cobra.Command) (interface{}, error) {
 	return ModuleStruct{Cmd: c}, nil
 }
 
+func (s ModuleStruct) PluginName() string {
+	return s.Name
+}
+
 func (s ModuleStruct) AddArguments() {
-	s.Cmd.PersistentFlags().BoolVarP(&versionFlag, "version", "v", false, "Display the current version of awsume")
+	//	s.Cmd.PersistentFlags().BoolVarP(&versionFlag, "version", "v", false, "Display the current version of awsume")
 	s.Cmd.PersistentFlags().StringVarP(&outputProfileFlag, "output-profile", "o", "", "A profile to output credentials to")
 	s.Cmd.PersistentFlags().BoolVarP(&cleanFlag, "clean", "", false, "Clean expired output profiles")
 	s.Cmd.PersistentFlags().BoolVarP(&refreshFlag, "refresh", "r", false, "Force refresh credentials")
@@ -60,10 +66,21 @@ func (s ModuleStruct) AddArguments() {
 	s.Cmd.PersistentFlags().StringVarP(&regionFlag, "region", "", "", "The region you want to awsume into")
 	s.Cmd.PersistentFlags().StringVarP(&sessionNameFlag, "session-name", "", "", "Set a custom role session name")
 	s.Cmd.PersistentFlags().Int64VarP(&roleDurationFlag, "role-duration", "", 0, "Seconds to get role creds for, 0 means the assume_role call will be made without role duration")
+	s.Cmd.PersistentFlags().BoolVarP(&withSamlFlag, "with-saml", "", false, "Use saml (requires plugin)")
+	s.Cmd.PersistentFlags().BoolVarP(&withWebIdentityFlag, "with-web-identity", "", false, "Use web identity (requires plugin")
 	s.Cmd.PersistentFlags().StringVarP(&jsonFlag, "json", "", "", "Use json credentials")
 	s.Cmd.PersistentFlags().StringVarP(&credentialsFileFlag, "credentials-file", "", "", "Target a shared credentials file")
 	s.Cmd.PersistentFlags().StringVarP(&configFileFlag, "config-file", "", "", "Target a config file")
 	s.Cmd.PersistentFlags().BoolVarP(&listPluginsFlag, "list-plugins", "", false, "List installed plugins")
 	s.Cmd.PersistentFlags().BoolVarP(&infoFlag, "info", "", false, "Print any info logs to stderr")
 	s.Cmd.PersistentFlags().BoolVarP(&debugFlag, "debug", "", false, "Print any debug logs to stderr")
+}
+
+func (s ModuleStruct) PostAddArguments() {
+	if s.Cmd.Flag("with-saml").Value {
+		if s.Cmd.Flag("with-web-identity").Value {
+			fmt.Println("Can not have both --with-saml and --with-web-identity")
+			os.Exit(1)
+		}
+	}
 }

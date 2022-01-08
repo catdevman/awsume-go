@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
+Copyright © 2022 Lucas Pearson <catdevman@gmail.com>
 
 */
 package cmd
@@ -15,13 +15,17 @@ import (
 )
 
 var cfgFile string
+var plugins []interface{}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "awsume-go",
-	Short: "Awsume - A cli that makes using AWS IAM credentials easy",
-	Long:  "Thank you for using AWSume! Check us out at https://trek10.com",
-	Run:   func(cmd *cobra.Command, args []string) {},
+	Use:     "awsume-go",
+	Version: "0.0.1",
+	Short:   "Awsume - A cli that makes using AWS IAM credentials easy",
+	Long:    "Thank you for using AWSume! Check us out at https://trek10.com",
+	Run: func(cmd *cobra.Command, args []string) {
+		handleArgs(plugins)
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -38,12 +42,12 @@ func init() {
 
 	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config-file", "", "config file (default is $HOME/.awsume/config.yaml)")
 
-	plugins, err := filepath.Glob("./plugins/*.so") // config directory plugins and local plugins in the future
+	pluginFiles, err := filepath.Glob("./plugins/*.so") // config directory plugins and local plugins in the future
 	if err != nil {
 		panic(err)
 	}
 
-	for _, filename := range plugins {
+	for _, filename := range pluginFiles {
 		p, err := plugin.Open(filename)
 		if err != nil {
 			panic(err)
@@ -57,14 +61,7 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
-		plugprearg, ok := plug.(hooks.AddArgumentsHook)
-		if ok {
-			plugprearg.AddArguments()
-		}
-		plugpost, ok := plug.(hooks.PostAddArgumentsHook)
-		if ok {
-			plugpost.PostAddArguments()
-		}
+		plugins = append(plugins, plug)
 	}
 }
 
@@ -88,5 +85,28 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
+	}
+}
+
+func handleArgs(plugs []interface{}) {
+	for _, p := range plugs {
+		preargplugin, ok := p.(hooks.PreAddArgumentsHook)
+		if ok {
+			preargplugin.PreAddArguments()
+		}
+	}
+
+	for _, p := range plugs {
+		addargsplugin, ok := p.(hooks.AddArgumentsHook)
+		if ok {
+			addargsplugin.AddArguments()
+		}
+	}
+
+	for _, p := range plugs {
+		postargsplugin, ok := p.(hooks.PostAddArgumentsHook)
+		if ok {
+			postargsplugin.PostAddArguments()
+		}
 	}
 }
