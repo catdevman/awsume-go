@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"plugin"
+	"strings"
 
 	"github.com/catdevman/awsume-go/pkg/hooks"
 	"github.com/rs/zerolog"
@@ -47,9 +48,8 @@ func init() {
 	}
 
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	log.Info().Msg("hello world")
 
-	pluginFiles, err := filepath.Glob(home + string(os.PathSeparator) + ".awsume" + string(os.PathSeparator) + "plugins" + string(os.PathSeparator) + "*.so") // config directory plugins and local plugins in the future
+	pluginFiles, err := filepath.Glob(strings.Join([]string{home, ".awsume", "plugins", "*.so"}, string(os.PathSeparator))) // config directory plugins and local plugins in the future
 	if err != nil {
 		panic(err)
 	}
@@ -65,7 +65,7 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
-		plug, err := symbol.(func(*cobra.Command) (interface{}, error))(rootCmd)
+		plug, err := symbol.(func(*cobra.Command, *viper.Viper) (interface{}, error))(rootCmd, viper.GetViper())
 		if err != nil {
 			panic(err)
 		}
