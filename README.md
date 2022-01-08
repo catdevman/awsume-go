@@ -1,4 +1,4 @@
-# Central entry to CLI
+# TODO
 - Parse Args
   - [x] Run all pre add arg hooks
   - [x] Run all add arg hooks
