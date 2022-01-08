@@ -2,17 +2,18 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
 )
 
 type ModuleStruct struct {
-	Cmd  *cobra.Command
-	Name string "default"
+	Cmd    *cobra.Command
+	Logger *log.Logger
+	Name   string "default"
 }
 
-var versionFlag bool
 var outputProfileFlag string
 var cleanFlag bool
 var refreshFlag bool
@@ -39,8 +40,8 @@ var listPluginsFlag bool
 var infoFlag bool
 var debugFlag bool
 
-func New(c *cobra.Command) (interface{}, error) {
-	return ModuleStruct{Cmd: c}, nil
+func New(c *cobra.Command, logger *log.Logger) (interface{}, error) {
+	return ModuleStruct{Cmd: c, Logger: logger}, nil
 }
 
 func (s ModuleStruct) PluginName() string {
@@ -48,7 +49,6 @@ func (s ModuleStruct) PluginName() string {
 }
 
 func (s ModuleStruct) AddArguments() {
-	//	s.Cmd.PersistentFlags().BoolVarP(&versionFlag, "version", "v", false, "Display the current version of awsume")
 	s.Cmd.PersistentFlags().StringVarP(&outputProfileFlag, "output-profile", "o", "", "A profile to output credentials to")
 	s.Cmd.PersistentFlags().BoolVarP(&cleanFlag, "clean", "", false, "Clean expired output profiles")
 	s.Cmd.PersistentFlags().BoolVarP(&refreshFlag, "refresh", "r", false, "Force refresh credentials")
@@ -77,10 +77,8 @@ func (s ModuleStruct) AddArguments() {
 }
 
 func (s ModuleStruct) PostAddArguments() {
-	if s.Cmd.Flag("with-saml").Value {
-		if s.Cmd.Flag("with-web-identity").Value {
-			fmt.Println("Can not have both --with-saml and --with-web-identity")
-			os.Exit(1)
-		}
+	if withSamlFlag && withWebIdentityFlag {
+		fmt.Println("Can not have both --with-saml and --with-web-identity")
+		os.Exit(1)
 	}
 }

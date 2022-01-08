@@ -5,6 +5,7 @@ Copyright © 2022 Lucas Pearson <catdevman@gmail.com>
 package cmd
 
 import (
+	"log"
 	"os"
 	"path/filepath"
 	"plugin"
@@ -14,17 +15,18 @@ import (
 	"github.com/spf13/viper"
 )
 
+var logger log.Logger
 var cfgFile string
 var plugins []interface{}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:     "awsume-go",
+	Use:     "awsume",
 	Version: "0.0.1",
 	Short:   "Awsume - A cli that makes using AWS IAM credentials easy",
 	Long:    "Thank you for using AWSume! Check us out at https://trek10.com",
 	Run: func(cmd *cobra.Command, args []string) {
-		handleArgs(plugins)
+		handlePostArgs(plugins)
 	},
 }
 
@@ -41,7 +43,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config-file", "", "config file (default is $HOME/.awsume/config.yaml)")
-
+	logger := log.Default()
 	pluginFiles, err := filepath.Glob("./plugins/*.so") // config directory plugins and local plugins in the future
 	if err != nil {
 		panic(err)
@@ -57,12 +59,14 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
-		plug, err := symbol.(func(*cobra.Command) (interface{}, error))(rootCmd)
+		plug, err := symbol.(func(*cobra.Command, *log.Logger) (interface{}, error))(rootCmd, logger)
 		if err != nil {
 			panic(err)
 		}
 		plugins = append(plugins, plug)
 	}
+	handlePreArgs(plugins)
+	handleArgs(plugins)
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -88,7 +92,7 @@ func initConfig() {
 	}
 }
 
-func handleArgs(plugs []interface{}) {
+func handlePreArgs(plugs []interface{}) {
 	for _, p := range plugs {
 		preargplugin, ok := p.(hooks.PreAddArgumentsHook)
 		if ok {
@@ -96,6 +100,9 @@ func handleArgs(plugs []interface{}) {
 		}
 	}
 
+}
+
+func handleArgs(plugs []interface{}) {
 	for _, p := range plugs {
 		addargsplugin, ok := p.(hooks.AddArgumentsHook)
 		if ok {
@@ -103,10 +110,14 @@ func handleArgs(plugs []interface{}) {
 		}
 	}
 
+}
+
+func handlePostArgs(plugs []interface{}) {
 	for _, p := range plugs {
 		postargsplugin, ok := p.(hooks.PostAddArgumentsHook)
 		if ok {
 			postargsplugin.PostAddArguments()
 		}
 	}
+
 }
