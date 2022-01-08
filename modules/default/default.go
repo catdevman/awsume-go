@@ -59,7 +59,7 @@ func (s ModuleStruct) AddArguments() {
 	s.Cmd.PersistentFlags().StringVarP(&mfaTokenFlag, "mfa-token", "", "", "You mfa token")
 	s.Cmd.PersistentFlags().StringVarP(&regionFlag, "region", "", "", "The region you want to awsume into")
 	s.Cmd.PersistentFlags().StringVarP(&sessionNameFlag, "session-name", "", "", "Set a custom role session name")
-	s.Cmd.PersistentFlags().Int64VarP(&roleDurationFlag, "role-duration", "", 0, "Seconds to gett role creds for, 0 means the assume_role call will be made without role duration")
+	s.Cmd.PersistentFlags().Int64VarP(&roleDurationFlag, "role-duration", "", 0, "Seconds to get role creds for, 0 means the assume_role call will be made without role duration")
 	s.Cmd.PersistentFlags().StringVarP(&jsonFlag, "json", "", "", "Use json credentials")
 	s.Cmd.PersistentFlags().StringVarP(&credentialsFileFlag, "credentials-file", "", "", "Target a shared credentials file")
 	s.Cmd.PersistentFlags().StringVarP(&configFileFlag, "config-file", "", "", "Target a config file")
