@@ -5,17 +5,17 @@ Copyright © 2022 Lucas Pearson <catdevman@gmail.com>
 package cmd
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 	"plugin"
 
 	"github.com/catdevman/awsume-go/pkg/hooks"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var logger log.Logger
 var cfgFile string
 var plugins []interface{}
 
@@ -45,7 +45,10 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	logger := log.Default()
+
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	log.Info().Msg("hello world")
+
 	pluginFiles, err := filepath.Glob(home + string(os.PathSeparator) + ".awsume" + string(os.PathSeparator) + "plugins" + string(os.PathSeparator) + "*.so") // config directory plugins and local plugins in the future
 	if err != nil {
 		panic(err)
@@ -53,6 +56,7 @@ func init() {
 
 	for _, filename := range pluginFiles {
 		p, err := plugin.Open(filename)
+		log.Info().Msg(filename)
 		if err != nil {
 			panic(err)
 		}
@@ -61,7 +65,7 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
-		plug, err := symbol.(func(*cobra.Command, *log.Logger) (interface{}, error))(rootCmd, logger)
+		plug, err := symbol.(func(*cobra.Command) (interface{}, error))(rootCmd)
 		if err != nil {
 			panic(err)
 		}

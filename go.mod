@@ -6,6 +6,7 @@ replace github.com/catdevman/awsume-go/pkg/hooks => ./pkg/hooks
 
 require (
 	github.com/catdevman/awsume-go/pkg/hooks v0.0.0-00010101000000-000000000000
+	github.com/rs/zerolog v1.26.1
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.1
 )

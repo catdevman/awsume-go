@@ -2,16 +2,14 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/spf13/cobra"
 )
 
 type ModuleStruct struct {
-	Cmd    *cobra.Command
-	Logger *log.Logger
-	Name   string "default"
+	Cmd  *cobra.Command
+	Name string "default"
 }
 
 var outputProfileFlag string
@@ -40,8 +38,8 @@ var listPluginsFlag bool
 var infoFlag bool
 var debugFlag bool
 
-func New(c *cobra.Command, logger *log.Logger) (interface{}, error) {
-	return ModuleStruct{Cmd: c, Logger: logger}, nil
+func New(c *cobra.Command) (interface{}, error) {
+	return ModuleStruct{Cmd: c}, nil
 }
 
 func (s ModuleStruct) PluginName() string {
