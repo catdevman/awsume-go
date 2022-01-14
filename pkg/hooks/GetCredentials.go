@@ -8,7 +8,7 @@ type GetCredentialsHook interface {
 	GetCredentials()
 }
 
-type PostGetCredentialsHooks interface {
+type PostGetCredentialsHook interface {
 	PostGetCredentials()
 }
 

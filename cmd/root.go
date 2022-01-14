@@ -12,13 +12,13 @@ import (
 
 	"github.com/catdevman/awsume-go/pkg/hooks"
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
 var plugins []interface{}
+var logger zerolog.Logger
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -28,6 +28,8 @@ var rootCmd = &cobra.Command{
 	Long:    "Thank you for using AWSume! Check us out at https://trek10.com",
 	Run: func(cmd *cobra.Command, args []string) {
 		handlePostArgs(plugins)
+		getProfiles(plugins)
+		getCredentials(plugins)
 	},
 }
 
@@ -48,6 +50,8 @@ func init() {
 	}
 
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	logger := zerolog.New(os.Stderr).With().Timestamp().Logger()
 
 	pluginFiles, err := filepath.Glob(strings.Join([]string{home, ".awsume", "plugins", "*.so"}, string(os.PathSeparator))) // config directory plugins and local plugins in the future
 	if err != nil {
@@ -56,7 +60,6 @@ func init() {
 
 	for _, filename := range pluginFiles {
 		p, err := plugin.Open(filename)
-		log.Info().Msg(filename)
 		if err != nil {
 			panic(err)
 		}
@@ -65,7 +68,7 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
-		plug, err := symbol.(func(*cobra.Command, *viper.Viper) (interface{}, error))(rootCmd, viper.GetViper())
+		plug, err := symbol.(func(*cobra.Command, *viper.Viper, *zerolog.Logger) (interface{}, error))(rootCmd, viper.GetViper(), &logger)
 		if err != nil {
 			panic(err)
 		}
@@ -123,6 +126,74 @@ func handlePostArgs(plugs []interface{}) {
 		postargsplugin, ok := p.(hooks.PostAddArgumentsHook)
 		if ok {
 			postargsplugin.PostAddArguments()
+		}
+	}
+}
+
+func getProfiles(plugs []interface{}) {
+	handlePreCollectProfiles(plugs)
+	handleCollectProfiles(plugs)
+	handlePostCollectProfiles(plugs)
+}
+
+func handlePreCollectProfiles(plugs []interface{}) {
+	for _, p := range plugs {
+		pregetprofileplugin, ok := p.(hooks.PreCollectProfilesHook)
+		if ok {
+			pregetprofileplugin.PreCollectProfiles()
+		}
+	}
+}
+
+func handleCollectProfiles(plugs []interface{}) {
+	for _, p := range plugs {
+		getprofileplugin, ok := p.(hooks.CollectProfilesHook)
+		if ok {
+			getprofileplugin.CollectProfiles()
+		}
+	}
+}
+
+func handlePostCollectProfiles(plugs []interface{}) {
+	for _, p := range plugs {
+		postgetprofileplugin, ok := p.(hooks.PostCollectProfilesHook)
+		if ok {
+			postgetprofileplugin.PostCollectProfiles()
+		}
+	}
+}
+
+func getCredentials(plugs []interface{}) {
+	handlePreGetCredentials(plugs)
+	handleGetCredentials(plugs)
+	handlePostGetCredentials(plugs)
+}
+
+func handlePreGetCredentials(plugs []interface{}) {
+	for _, p := range plugs {
+		pregetcredentialsplugin, ok := p.(hooks.PreGetCredentialsHook)
+		if ok {
+			pregetcredentialsplugin.PreGetCredentials()
+		}
+	}
+
+}
+
+func handleGetCredentials(plugs []interface{}) {
+	for _, p := range plugs {
+		getcredentialsplugin, ok := p.(hooks.GetCredentialsHook)
+		if ok {
+			getcredentialsplugin.GetCredentials()
+		}
+	}
+
+}
+
+func handlePostGetCredentials(plugs []interface{}) {
+	for _, p := range plugs {
+		postgetcredentialsplugin, ok := p.(hooks.PostGetCredentialsHook)
+		if ok {
+			postgetcredentialsplugin.PostGetCredentials()
 		}
 	}
 

@@ -5,13 +5,18 @@ import (
 	"os"
 	"strings"
 
+	"github.com/bigkevmcd/go-configparser"
+	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
+var Profiles map[string]interface{}
+
 type ModuleStruct struct {
 	Cmd    *cobra.Command
 	Config *viper.Viper
+	Logger *zerolog.Logger
 	Name   string "default"
 }
 
@@ -41,8 +46,9 @@ var listPluginsFlag bool
 var infoFlag bool
 var debugFlag bool
 
-func New(c *cobra.Command, v *viper.Viper) (interface{}, error) {
-	return ModuleStruct{Cmd: c, Config: v}, nil
+func New(c *cobra.Command, v *viper.Viper, l *zerolog.Logger) (interface{}, error) {
+	Profiles = make(map[string]interface{})
+	return ModuleStruct{Cmd: c, Config: v, Logger: l}, nil
 }
 
 func (s ModuleStruct) PluginName() string {
@@ -78,67 +84,123 @@ func (s ModuleStruct) AddArguments() {
 }
 
 func (s ModuleStruct) PostAddArguments() {
-	configFile, credentialsFile := getAWSFiles(s)
-	fmt.Println(configFile, credentialsFile)
+	if debugFlag {
+		s.Logger.Info().Msg("Debug is set to true")
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		s.Logger.Level(zerolog.DebugLevel)
+	}
+
 	if withSamlFlag && withWebIdentityFlag {
-		fmt.Println("Can not have both --with-saml and --with-web-identity")
+		s.Logger.Debug().Msg("Can not have both --with-saml and --with-web-identity")
 		os.Exit(1)
 	}
 	if autoRefreshFlag {
 		if roleARNFlag != "" {
-			fmt.Println("Cannot use autoawsume with a given role_arn")
+			s.Logger.Debug().Msg("Cannot use autoawsume with a given role_arn")
 			os.Exit(1)
 		}
 		if jsonFlag != "" {
-			fmt.Println("Cannot use autoawsume with json")
+			s.Logger.Debug().Msg("Cannot use autoawsume with json")
 			os.Exit(1)
 		}
 	}
 	if cleanFlag {
-		runClean(s)
+		s.runClean()
 	}
 }
 
-func runClean(s ModuleStruct) {
-	_, credentialsFile := getAWSFiles(s)
-	fmt.Println(credentialsFile)
-	removeExpiredOutputProfiles(credentialsFile)
+func (s ModuleStruct) runClean() {
+	_, credentialsFile := s.getAWSFiles()
+	s.removeExpiredOutputProfiles(credentialsFile)
 	os.Exit(0)
 }
 
-func getAWSFiles(s ModuleStruct) (configFile, credentialsFile string) {
+func (s ModuleStruct) getAWSFiles() (configFile, credentialsFile string) {
 
 	if os.Getenv("AWS_CONFIG_FILE") != "" {
+		s.Logger.Debug().Msg("Setting config file from env var")
 		configFile = os.Getenv("AWS_CONFIG_FILE")
 	} else if configFileFlag != "" {
+		s.Logger.Debug().Msg("Setting config file from config-file CLI parameter")
 		configFile = configFileFlag
-	} else if s.Config.Get("config-file") != "" {
-		configFile, _ = s.Config.Get("config-file").(string)
+	} else if file, ok := s.Config.Get("config-file").(string); ok {
+		s.Logger.Debug().Msg("Setting config file from config-file in config file")
+		configFile = file
 	} else {
 		home, err := os.UserHomeDir()
 		if err != nil {
-			fmt.Println("Had issue with getting home directory")
+			s.Logger.Debug().Msg("Had issue with getting home directory")
 		}
+		s.Logger.Debug().Msg("Setting config file from default location for aws")
 		configFile = strings.Join([]string{home, ".aws", "config"}, string(os.PathSeparator))
 	}
 
 	if os.Getenv("AWS_SHARED_CREDENTIALS_FILE") != "" {
+		s.Logger.Debug().Msg("Setting config file from env var")
 		credentialsFile = os.Getenv("AWS_SHARED_CREDENTIALS_FILE")
 	} else if credentialsFileFlag != "" {
+		s.Logger.Debug().Msg("Setting credentials file from credentials-file CLI parameter")
 		credentialsFile = credentialsFileFlag
-	} else if s.Config.Get("credentials-file") != "" {
-		credentialsFile, _ = s.Config.Get("credentials-file").(string)
+	} else if file, ok := s.Config.Get("credentials-file").(string); ok {
+		s.Logger.Debug().Msg("Setting credentials file from credentials-file in config file")
+		credentialsFile = file
 	} else {
 		home, err := os.UserHomeDir()
 		if err != nil {
-			fmt.Println("Had issue with getting home directory")
+			s.Logger.Error().Msg("Had issue with getting home directory")
 		}
+		s.Logger.Debug().Msg("Setting credentials file from default local for aws")
 		credentialsFile = strings.Join([]string{home, ".aws", "credentials"}, string(os.PathSeparator))
 	}
+
+	s.Logger.Debug().Msg(configFile)
+	s.Logger.Debug().Msg(credentialsFile)
 
 	return configFile, credentialsFile
 }
 
-func removeExpiredOutputProfiles(string) {
+func (s ModuleStruct) removeExpiredOutputProfiles(fileName string) {
+	s.Logger.Info().Msg("Removing Expired Output Profiles from " + fileName)
+	var profileConfig = viper.New()
+	profileConfig.SetConfigFile(fileName)
+	profileConfig.SetConfigType("ini")
+	err := profileConfig.ReadInConfig() // Find and read the config file
+	if err != nil {                     // Handle errors reading the config file
+		panic(fmt.Errorf("Fatal error config file: %w \n", err))
+	}
+	// fmt.Println(profileConfig)
+	// TODO
+	// Skip if it has `manager` that is not awsume
+	// Skip if it has `autoawsume`
+	// If you find something with expiration that is older than now then find all keys with that "prefix" and remove them
+}
 
+func (s ModuleStruct) PreCollectProfiles() {
+	s.Logger.Info().Msg("In Pre Collect Profiles")
+}
+
+func (s ModuleStruct) CollectProfiles() {
+	configFile, credentialsFile := s.getAWSFiles()
+	config, err := configparser.NewConfigParserFromFile(configFile)
+	if err != nil {
+		panic(fmt.Errorf("Fatal error config file: %w \n", err))
+	}
+	creds, err := configparser.NewConfigParserFromFile(credentialsFile)
+	if err != nil {
+		panic(fmt.Errorf("Fatal error credentials fiie: %w \n", err))
+	}
+	for _, profile := range config.Sections() {
+		shortName := strings.Replace(profile, "profile ", "", -1)
+		if _, ok := Profiles[shortName]; ok {
+			// TODO Profile already exists now what
+		} else {
+			c, _ := creds.Items(shortName)
+			Profiles[shortName] = c
+		}
+	}
+	s.Logger.Info().Msg("In Collect Profiles")
+}
+
+func (s ModuleStruct) PostCollectProfiles() {
+	s.Logger.Info().Msg("In Post Collect Profiles")
 }

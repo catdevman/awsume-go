@@ -12,11 +12,14 @@ require (
 )
 
 require (
+	github.com/aws/aws-sdk-go v1.42.34 // indirect
+	github.com/bigkevmcd/go-configparser v0.0.0-20210106142102-909504547ead // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
+	github.com/mvo5/goconfigparser v0.0.0-20201015074339-50f22f44deb5 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/spf13/afero v1.8.0 // indirect
 	github.com/spf13/cast v1.4.1 // indirect

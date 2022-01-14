@@ -5,7 +5,7 @@
   - [ ] Handle anything that is needed with the args
   - [x] Run all post add arg hooks
 - Get Profiles(args)
-  - [ ] Get AWS files (config and credentials)
+  - [x] Get AWS files (config and credentials)
   - [ ] Run all pre collect profiles hooks
   - [ ] Run all collect profiles hooks
   - [ ] Aggregate profiles
