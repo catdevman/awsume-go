@@ -9,8 +9,10 @@ import (
 	"path/filepath"
 	"plugin"
 	"strings"
+	"time"
 
 	"github.com/catdevman/awsume-go/pkg/hooks"
+	"github.com/catdevman/awsume-go/shared"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -19,6 +21,7 @@ import (
 var cfgFile string
 var plugins []interface{}
 var logger zerolog.Logger
+var profiles shared.Profiles
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -49,15 +52,15 @@ func init() {
 		panic(err)
 	}
 
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	logger := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}).With().Timestamp().Logger()
 
 	pluginFiles, err := filepath.Glob(strings.Join([]string{home, ".awsume", "plugins", "*.so"}, string(os.PathSeparator))) // config directory plugins and local plugins in the future
 	if err != nil {
 		panic(err)
 	}
 
+	awsume := shared.Awsume{Cmd: rootCmd, Config: viper.GetViper(), Logger: &logger}
 	for _, filename := range pluginFiles {
 		p, err := plugin.Open(filename)
 		if err != nil {
@@ -68,7 +71,7 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
-		plug, err := symbol.(func(*cobra.Command, *viper.Viper, *zerolog.Logger) (interface{}, error))(rootCmd, viper.GetViper(), &logger)
+		plug, err := symbol.(func(*shared.Awsume) (interface{}, error))(&awsume)
 		if err != nil {
 			panic(err)
 		}
@@ -149,7 +152,10 @@ func handleCollectProfiles(plugs []interface{}) {
 	for _, p := range plugs {
 		getprofileplugin, ok := p.(hooks.CollectProfilesHook)
 		if ok {
-			getprofileplugin.CollectProfiles()
+			// TODO: mutex lock and use go routines
+			// or make a profiles channel give to CollecctProfiles
+			prs := getprofileplugin.CollectProfiles()
+			profiles = profiles.Add(prs)
 		}
 	}
 }

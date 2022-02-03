@@ -6,12 +6,11 @@ import (
 	"strings"
 
 	"github.com/bigkevmcd/go-configparser"
+	"github.com/catdevman/awsume-go/shared"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
-
-var Profiles map[string]interface{}
 
 type ModuleStruct struct {
 	Cmd    *cobra.Command
@@ -46,9 +45,8 @@ var listPluginsFlag bool
 var infoFlag bool
 var debugFlag bool
 
-func New(c *cobra.Command, v *viper.Viper, l *zerolog.Logger) (interface{}, error) {
-	Profiles = make(map[string]interface{})
-	return ModuleStruct{Cmd: c, Config: v, Logger: l}, nil
+func New(a *shared.Awsume) (interface{}, error) {
+	return ModuleStruct{Cmd: a.Cmd, Config: a.Config, Logger: a.Logger}, nil
 }
 
 func (s ModuleStruct) PluginName() string {
@@ -85,7 +83,7 @@ func (s ModuleStruct) AddArguments() {
 
 func (s ModuleStruct) PostAddArguments() {
 	if debugFlag {
-		s.Logger.Info().Msg("Debug is set to true")
+		s.Logger.Debug().Msg("Debug is set to true")
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		s.Logger.Level(zerolog.DebugLevel)
 	}
@@ -160,7 +158,7 @@ func (s ModuleStruct) getAWSFiles() (configFile, credentialsFile string) {
 }
 
 func (s ModuleStruct) removeExpiredOutputProfiles(fileName string) {
-	s.Logger.Info().Msg("Removing Expired Output Profiles from " + fileName)
+	s.Logger.Debug().Msg("Removing Expired Output Profiles from " + fileName)
 	var profileConfig = viper.New()
 	profileConfig.SetConfigFile(fileName)
 	profileConfig.SetConfigType("ini")
@@ -176,12 +174,13 @@ func (s ModuleStruct) removeExpiredOutputProfiles(fileName string) {
 }
 
 func (s ModuleStruct) PreCollectProfiles() {
-	s.Logger.Info().Msg("In Pre Collect Profiles")
+	s.Logger.Debug().Msg("In Pre Collect Profiles")
 }
 
-func (s ModuleStruct) CollectProfiles() {
+func (s ModuleStruct) CollectProfiles() shared.Profiles {
 	configFile, credentialsFile := s.getAWSFiles()
 	config, err := configparser.NewConfigParserFromFile(configFile)
+	profiles := shared.Profiles{}
 	if err != nil {
 		panic(fmt.Errorf("Fatal error config file: %w \n", err))
 	}
@@ -191,16 +190,19 @@ func (s ModuleStruct) CollectProfiles() {
 	}
 	for _, profile := range config.Sections() {
 		shortName := strings.Replace(profile, "profile ", "", -1)
-		if _, ok := Profiles[shortName]; ok {
+		if _, ok := profiles[shortName]; ok {
 			// TODO Profile already exists now what
 		} else {
 			c, _ := creds.Items(shortName)
-			Profiles[shortName] = c
+			fmt.Println(c)
+			p := shared.Profile{}
+			profiles[shortName] = p
 		}
 	}
-	s.Logger.Info().Msg("In Collect Profiles")
+	s.Logger.Debug().Msg("In Collect Profiles")
+	return profiles
 }
 
 func (s ModuleStruct) PostCollectProfiles() {
-	s.Logger.Info().Msg("In Post Collect Profiles")
+	s.Logger.Debug().Msg("In Post Collect Profiles")
 }
