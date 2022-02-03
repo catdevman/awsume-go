@@ -13,10 +13,13 @@ type Awsume struct {
 }
 
 type Profile struct {
-	RoleArn       string
-	SourceProfile string
-	MfaSerial     string
-	Region        string
+	RoleArn            string
+	SourceProfile      string
+	AwsAccessKeyId     string
+	AwsSecretAccessKey string
+	MfaSerial          string
+	Region             string
+	Output             string
 }
 
 type Profiles map[string]Profile

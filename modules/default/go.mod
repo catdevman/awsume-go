@@ -1,14 +1,9 @@
-module github.com/catdevman/awsume-go
+module github.com/catdevman/awsume-go/modules/default
 
 go 1.17
 
-replace github.com/catdevman/awsume-go/pkg/hooks => ./pkg/hooks
-
-replace github.com/catdevman/awsume-go/shared => ./shared
-
 require (
 	github.com/bigkevmcd/go-configparser v0.0.0-20210106142102-909504547ead
-	github.com/catdevman/awsume-go/pkg/hooks v0.0.0-00010101000000-000000000000
 	github.com/catdevman/awsume-go/shared v0.0.0-20220203051320-4d300bf39cb9
 	github.com/rs/zerolog v1.26.1
 	github.com/spf13/cobra v1.3.0
@@ -22,12 +17,12 @@ require (
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
-	github.com/spf13/afero v1.8.0 // indirect
+	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
+	golang.org/x/sys v0.0.0-20211210111614-af8b64212486 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/ini.v1 v1.66.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

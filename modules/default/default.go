@@ -16,7 +16,7 @@ type ModuleStruct struct {
 	Cmd    *cobra.Command
 	Config *viper.Viper
 	Logger *zerolog.Logger
-	Name   string "default"
+	Name   string
 }
 
 var outputProfileFlag string
@@ -50,7 +50,7 @@ func New(a *shared.Awsume) (interface{}, error) {
 }
 
 func (s ModuleStruct) PluginName() string {
-	return s.Name
+	return "default"
 }
 
 func (s ModuleStruct) AddArguments() {
@@ -179,7 +179,7 @@ func (s ModuleStruct) PreCollectProfiles() {
 
 func (s ModuleStruct) CollectProfiles() shared.Profiles {
 	configFile, credentialsFile := s.getAWSFiles()
-	config, err := configparser.NewConfigParserFromFile(configFile)
+	configs, err := configparser.NewConfigParserFromFile(configFile)
 	profiles := shared.Profiles{}
 	if err != nil {
 		panic(fmt.Errorf("Fatal error config file: %w \n", err))
@@ -188,15 +188,50 @@ func (s ModuleStruct) CollectProfiles() shared.Profiles {
 	if err != nil {
 		panic(fmt.Errorf("Fatal error credentials fiie: %w \n", err))
 	}
-	for _, profile := range config.Sections() {
-		shortName := strings.Replace(profile, "profile ", "", -1)
-		if _, ok := profiles[shortName]; ok {
+	for _, cred := range creds.Sections() {
+		if _, ok := profiles[cred]; ok {
 			// TODO Profile already exists now what
 		} else {
-			c, _ := creds.Items(shortName)
-			fmt.Println(c)
+			c, _ := creds.Items(cred)
 			p := shared.Profile{}
-			profiles[shortName] = p
+			if val, ok := c["mfa_serial"]; ok {
+				p.MfaSerial = val
+			}
+			if val, ok := c["region"]; ok {
+				p.Region = val
+			} else {
+				// TODO is this bad??
+				p.Region = "us-east-1"
+			}
+
+			if val, ok := c["aws_access_key_id"]; ok {
+				p.AwsAccessKeyId = val
+			}
+
+			if val, ok := c["aws_secret_access_key"]; ok {
+				p.AwsSecretAccessKey = val
+			}
+			profiles[cred] = p
+		}
+	}
+
+	for _, config := range configs.Sections() {
+		shortName := strings.Replace(config, "profile ", "", -1)
+
+		if _, ok := profiles[shortName]; ok {
+			c, _ := configs.Items(config)
+			if val, ok := c["region"]; ok {
+				p := profiles[shortName]
+				p.Region = val
+				profiles[shortName] = p
+			}
+			if val, ok := c["output"]; ok {
+				p := profiles[shortName]
+				p.Output = val
+				profiles[shortName] = p
+			}
+		} else {
+			//TODO no profile exists with this name yet
 		}
 	}
 	s.Logger.Debug().Msg("In Collect Profiles")

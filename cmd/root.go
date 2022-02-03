@@ -155,6 +155,9 @@ func handleCollectProfiles(plugs []interface{}) {
 			// TODO: mutex lock and use go routines
 			// or make a profiles channel give to CollecctProfiles
 			prs := getprofileplugin.CollectProfiles()
+			if profiles == nil {
+				profiles = shared.Profiles{}
+			}
 			profiles = profiles.Add(prs)
 		}
 	}
