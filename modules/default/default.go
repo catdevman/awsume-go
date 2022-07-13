@@ -7,6 +7,7 @@ import (
 
 	"github.com/bigkevmcd/go-configparser"
 	"github.com/catdevman/awsume-go/shared"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -238,6 +239,36 @@ func (s ModuleStruct) CollectProfiles() shared.Profiles {
 	return profiles
 }
 
-func (s ModuleStruct) PostCollectProfiles() {
+func (s ModuleStruct) PostCollectProfiles(profiles shared.Profiles) {
 	s.Logger.Debug().Msg("In Post Collect Profiles")
+	if listProfilesFlag {
+		t := table.NewWriter()
+		t.SetOutputMirror(os.Stdout)
+		t.AppendHeader(table.Row{"PROFILE", "TYPE", "SOURCE", "MFA?", "REGION", "ACCOUNT"})
+		for profile := range profiles {
+			p := profiles[profile]
+			ty := "User"
+			source := "None"
+			mfa := "No"
+			region := ""
+			account := "Unavailable"
+			if p.RoleArn != "" {
+				ty = "Role"
+			}
+
+			if p.MfaSerial != "" {
+				mfa = "Yes"
+			}
+
+			if p.Region != "" {
+				region = p.Region
+			}
+			if p.GetAccountId() != "" {
+				account = p.GetAccountId()
+			}
+
+			t.AppendRow([]interface{}{profile, ty, source, mfa, region, account})
+		}
+		t.Render()
+	}
 }

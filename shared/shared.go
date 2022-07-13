@@ -1,6 +1,8 @@
 package shared
 
 import (
+	"strings"
+
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -32,4 +34,21 @@ func (p Profiles) Add(prs Profiles) Profiles {
 	}
 
 	return p
+}
+
+func (p Profile) GetAccountId() string {
+	//TODO Add SSO Profile stuff
+	if p.RoleArn != "" {
+		return strings.Split(p.RoleArn, ":")[4]
+	}
+
+	if p.SourceProfile != "" {
+		return strings.Split(p.SourceProfile, ":")[4]
+	}
+
+	if p.MfaSerial != "" {
+		return strings.Split(p.MfaSerial, ":")[4]
+	}
+
+	return ""
 }

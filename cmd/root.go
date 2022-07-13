@@ -5,6 +5,7 @@ Copyright © 2022 Lucas Pearson <catdevman@gmail.com>
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"plugin"
@@ -158,6 +159,7 @@ func handleCollectProfiles(plugs []interface{}) {
 			if profiles == nil {
 				profiles = shared.Profiles{}
 			}
+			fmt.Println(prs)
 			profiles = profiles.Add(prs)
 		}
 	}
@@ -167,7 +169,7 @@ func handlePostCollectProfiles(plugs []interface{}) {
 	for _, p := range plugs {
 		postgetprofileplugin, ok := p.(hooks.PostCollectProfilesHook)
 		if ok {
-			postgetprofileplugin.PostCollectProfiles()
+			postgetprofileplugin.PostCollectProfiles(profiles)
 		}
 	}
 }

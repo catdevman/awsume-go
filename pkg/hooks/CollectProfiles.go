@@ -11,5 +11,5 @@ type CollectProfilesHook interface {
 }
 
 type PostCollectProfilesHook interface {
-	PostCollectProfiles()
+	PostCollectProfiles(shared.Profiles)
 }

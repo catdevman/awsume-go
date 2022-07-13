@@ -6,10 +6,10 @@
   - [x] Run all post add arg hooks
 - Get Profiles(args)
   - [x] Get AWS files (config and credentials)
-  - [ ] Run all pre collect profiles hooks
-  - [ ] Run all collect profiles hooks
-  - [ ] Aggregate profiles
-  - [ ] Run all post collect profiles hooks
+  - [x] Run all pre collect profiles hooks
+  - [x] Run all collect profiles hooks
+  - [x] Aggregate profiles
+  - [x] Run all post collect profiles hooks
 - Get Credentials(args, profiles)
   - [ ] Run all pre get creds
   - [ ] Check args for auto_refresh and arg.json, with_saml, with_web_identity, or else
