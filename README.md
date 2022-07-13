@@ -23,4 +23,5 @@
 - [ ] Export credentials data
 
 
-- Look at default plugins and create a plugin for it
+- [ ] Change hook, shared etc... to use hashicorp plugin system over grpc.  Generate a protobuf(s) to work with the hooks.
+- [ ] Look at default plugins and create a plugin for it
