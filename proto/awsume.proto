@@ -1,0 +1,55 @@
+syntax = "proto3";
+package proto;
+
+option go_package ="/proto";
+
+
+message Profile {
+    string RoleArn = 1;
+    string SourceProfile = 2;
+    string AwsAccessKeyId = 3;
+    string AwsAccessKeySecret = 4;
+    string MfaSerial = 5;
+    string Region = 6;
+    string Output = 7;
+}
+
+message ProfilesMsg {
+    repeated Profile profiles = 1;
+}
+
+message Argument {
+    string type = 1;
+    string value = 2;
+    string name = 3;
+    string flag = 4;
+}
+
+message ArgumentsMsg {
+    repeated Argument arguments = 1;
+}
+message Empty {}
+
+service Arguments {
+    rpc Pre(Empty) returns (Empty);
+    rpc Get(Empty) returns (ArgumentsMsg);
+    rpc Post(ArgumentsMsg) returns (Empty);
+}
+
+service Profiles {
+    rpc Pre (Empty) returns (Empty);
+    rpc Get(Empty) returns (ProfilesMsg);
+    rpc Post(ProfilesMsg) returns (Empty);
+}
+
+service Credentials {
+    rpc Pre(Empty) returns (Empty);
+    rpc Get(Empty) returns (Empty);
+    rpc Post(Empty) returns (Empty);
+}
+
+service ProfileNames {
+    rpc Pre(Empty) returns (Empty);
+    rpc Get(Empty) returns (Empty);
+    rpc Post(Empty) returns (Empty);
+}

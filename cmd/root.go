@@ -7,20 +7,20 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
-	"plugin"
 	"strings"
-	"time"
 
 	"github.com/catdevman/awsume-go/pkg/hooks"
 	"github.com/catdevman/awsume-go/shared"
+	"github.com/hashicorp/go-plugin"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
-var plugins []interface{}
+var plugins []plugin.ClientProtocol
 var logger zerolog.Logger
 var profiles shared.Profiles
 
@@ -53,30 +53,34 @@ func init() {
 		panic(err)
 	}
 
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}).With().Timestamp().Logger()
+	//zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	//logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}).With().Timestamp().Logger()
 
-	pluginFiles, err := filepath.Glob(strings.Join([]string{home, ".awsume", "plugins", "*.so"}, string(os.PathSeparator))) // config directory plugins and local plugins in the future
+	pluginFiles, err := filepath.Glob(strings.Join([]string{home, ".awsume", "plugins", "*"}, string(os.PathSeparator))) // config directory plugins and local plugins in the future
 	if err != nil {
 		panic(err)
 	}
 
-	awsume := shared.Awsume{Cmd: rootCmd, Config: viper.GetViper(), Logger: &logger}
+	// We should no longer need a share app to pass around we will use messages over grpc to communicate state back to the main process
+	//awsume := shared.Awsume{Cmd: rootCmd, Config: viper.GetViper(), Logger: &logger}
+	// loop through files and boot them up
+	// TODO: How do I know what to dispense from the RPC client... can they all have the same name like `awsume-plugin`?
 	for _, filename := range pluginFiles {
-		p, err := plugin.Open(filename)
-		if err != nil {
-			panic(err)
-		}
+		client := plugin.NewClient(&plugin.ClientConfig{
+			HandshakeConfig:  shared.Handshake,
+			Plugins:          shared.PluginMap,
+			Cmd:              exec.Command("sh", "-c", filename),
+			AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
+		})
+		defer client.Kill()
 
-		symbol, err := p.Lookup("New")
+		// Connect via RPC
+		rpcClient, err := client.Client()
 		if err != nil {
-			panic(err)
+			fmt.Println("Error:", err.Error())
+			os.Exit(1)
 		}
-		plug, err := symbol.(func(*shared.Awsume) (interface{}, error))(&awsume)
-		if err != nil {
-			panic(err)
-		}
-		plugins = append(plugins, plug)
+		plugins := append(plugins, rpcClient)
 	}
 	handlePreArgs(plugins)
 	handleArgs(plugins)
@@ -105,7 +109,7 @@ func initConfig() {
 	}
 }
 
-func handlePreArgs(plugs []interface{}) {
+func handlePreArgs(plugs []plugin.ClientProtocol) {
 	for _, p := range plugs {
 		preargplugin, ok := p.(hooks.PreAddArgumentsHook)
 		if ok {
@@ -115,7 +119,7 @@ func handlePreArgs(plugs []interface{}) {
 
 }
 
-func handleArgs(plugs []interface{}) {
+func handleArgs(plugs []plugin.ClientProtocol) {
 	for _, p := range plugs {
 		addargsplugin, ok := p.(hooks.AddArgumentsHook)
 		if ok {
@@ -125,7 +129,7 @@ func handleArgs(plugs []interface{}) {
 
 }
 
-func handlePostArgs(plugs []interface{}) {
+func handlePostArgs(plugs []plugin.ClientProtocol) {
 	for _, p := range plugs {
 		postargsplugin, ok := p.(hooks.PostAddArgumentsHook)
 		if ok {
@@ -134,13 +138,13 @@ func handlePostArgs(plugs []interface{}) {
 	}
 }
 
-func getProfiles(plugs []interface{}) {
+func getProfiles(plugs []plugin.ClientProtocol) {
 	handlePreCollectProfiles(plugs)
 	handleCollectProfiles(plugs)
 	handlePostCollectProfiles(plugs)
 }
 
-func handlePreCollectProfiles(plugs []interface{}) {
+func handlePreCollectProfiles(plugs []plugin.ClientProtocol) {
 	for _, p := range plugs {
 		pregetprofileplugin, ok := p.(hooks.PreCollectProfilesHook)
 		if ok {
@@ -149,7 +153,7 @@ func handlePreCollectProfiles(plugs []interface{}) {
 	}
 }
 
-func handleCollectProfiles(plugs []interface{}) {
+func handleCollectProfiles(plugs []plugin.ClientProtocol) {
 	for _, p := range plugs {
 		getprofileplugin, ok := p.(hooks.CollectProfilesHook)
 		if ok {
@@ -165,7 +169,7 @@ func handleCollectProfiles(plugs []interface{}) {
 	}
 }
 
-func handlePostCollectProfiles(plugs []interface{}) {
+func handlePostCollectProfiles(plugs []plugin.ClientProtocol) {
 	for _, p := range plugs {
 		postgetprofileplugin, ok := p.(hooks.PostCollectProfilesHook)
 		if ok {
@@ -174,13 +178,13 @@ func handlePostCollectProfiles(plugs []interface{}) {
 	}
 }
 
-func getCredentials(plugs []interface{}) {
+func getCredentials(plugs []plugin.ClientProtocol) {
 	handlePreGetCredentials(plugs)
 	handleGetCredentials(plugs)
 	handlePostGetCredentials(plugs)
 }
 
-func handlePreGetCredentials(plugs []interface{}) {
+func handlePreGetCredentials(plugs []plugin.ClientProtocol) {
 	for _, p := range plugs {
 		pregetcredentialsplugin, ok := p.(hooks.PreGetCredentialsHook)
 		if ok {
@@ -190,7 +194,7 @@ func handlePreGetCredentials(plugs []interface{}) {
 
 }
 
-func handleGetCredentials(plugs []interface{}) {
+func handleGetCredentials(plugs []plugin.ClientProtocol) {
 	for _, p := range plugs {
 		getcredentialsplugin, ok := p.(hooks.GetCredentialsHook)
 		if ok {
@@ -200,7 +204,7 @@ func handleGetCredentials(plugs []interface{}) {
 
 }
 
-func handlePostGetCredentials(plugs []interface{}) {
+func handlePostGetCredentials(plugs []plugin.ClientProtocol) {
 	for _, p := range plugs {
 		postgetcredentialsplugin, ok := p.(hooks.PostGetCredentialsHook)
 		if ok {
