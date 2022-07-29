@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/catdevman/awsume-go/pkg/hooks"
 	"github.com/catdevman/awsume-go/shared"
 	"github.com/hashicorp/go-plugin"
 	"github.com/rs/zerolog"
@@ -20,7 +19,7 @@ import (
 )
 
 var cfgFile string
-var plugins []plugin.ClientProtocol
+var plugins []*plugin.Client
 var logger zerolog.Logger
 var profiles shared.Profiles
 
@@ -69,18 +68,11 @@ func init() {
 		client := plugin.NewClient(&plugin.ClientConfig{
 			HandshakeConfig:  shared.Handshake,
 			Plugins:          shared.PluginMap,
-			Cmd:              exec.Command("sh", "-c", filename),
+			Cmd:              exec.Command("sh", "-c", filename), //TODO: This seems heavy handed can we load these paths from the conf file
 			AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
 		})
-		defer client.Kill()
 
-		// Connect via RPC
-		rpcClient, err := client.Client()
-		if err != nil {
-			fmt.Println("Error:", err.Error())
-			os.Exit(1)
-		}
-		plugins := append(plugins, rpcClient)
+		plugins = append(plugins, client)
 	}
 	handlePreArgs(plugins)
 	handleArgs(plugins)
@@ -109,107 +101,73 @@ func initConfig() {
 	}
 }
 
-func handlePreArgs(plugs []plugin.ClientProtocol) {
-	for _, p := range plugs {
-		preargplugin, ok := p.(hooks.PreAddArgumentsHook)
-		if ok {
-			preargplugin.PreAddArguments()
-		}
-	}
+func handlePreArgs(plugs []*plugin.Client) {
 
 }
 
-func handleArgs(plugs []plugin.ClientProtocol) {
-	for _, p := range plugs {
-		addargsplugin, ok := p.(hooks.AddArgumentsHook)
-		if ok {
-			addargsplugin.AddArguments()
-		}
-	}
+func handleArgs(plugs []*plugin.Client) {
 
 }
 
-func handlePostArgs(plugs []plugin.ClientProtocol) {
-	for _, p := range plugs {
-		postargsplugin, ok := p.(hooks.PostAddArgumentsHook)
-		if ok {
-			postargsplugin.PostAddArguments()
-		}
-	}
+func handlePostArgs(plugs []*plugin.Client) {
 }
 
-func getProfiles(plugs []plugin.ClientProtocol) {
+func getProfiles(plugs []*plugin.Client) {
 	handlePreCollectProfiles(plugs)
 	handleCollectProfiles(plugs)
 	handlePostCollectProfiles(plugs)
 }
 
-func handlePreCollectProfiles(plugs []plugin.ClientProtocol) {
+func handlePreCollectProfiles(plugs []*plugin.Client) {
 	for _, p := range plugs {
-		pregetprofileplugin, ok := p.(hooks.PreCollectProfilesHook)
-		if ok {
-			pregetprofileplugin.PreCollectProfiles()
+		client, err := p.Client()
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
 		}
+		raw, err := client.Dispense("profiles_grpc")
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		pregetprofileplugin := raw.(shared.ProfilesService)
+		pregetprofileplugin.Pre()
 	}
 }
 
-func handleCollectProfiles(plugs []plugin.ClientProtocol) {
-	for _, p := range plugs {
-		getprofileplugin, ok := p.(hooks.CollectProfilesHook)
-		if ok {
-			// TODO: mutex lock and use go routines
-			// or make a profiles channel give to CollecctProfiles
-			prs := getprofileplugin.CollectProfiles()
-			if profiles == nil {
-				profiles = shared.Profiles{}
-			}
-			fmt.Println(prs)
-			profiles = profiles.Add(prs)
-		}
-	}
+func handleCollectProfiles(plugs []*plugin.Client) {
+	//	for _, p := range plugs {
+	//		getprofileplugin, ok := &p.(hooks.CollectProfilesHook)
+	//		if ok {
+	//			// TODO: mutex lock and use go routines
+	//			// or make a profiles channel give to CollecctProfiles
+	//			prs := getprofileplugin.CollectProfiles()
+	//			if profiles == nil {
+	//				profiles = shared.Profiles{}
+	//			}
+	//			fmt.Println(prs)
+	//			profiles = profiles.Add(prs)
+	//		}
+	//	}
 }
 
-func handlePostCollectProfiles(plugs []plugin.ClientProtocol) {
-	for _, p := range plugs {
-		postgetprofileplugin, ok := p.(hooks.PostCollectProfilesHook)
-		if ok {
-			postgetprofileplugin.PostCollectProfiles(profiles)
-		}
-	}
+func handlePostCollectProfiles(plugs []*plugin.Client) {
 }
 
-func getCredentials(plugs []plugin.ClientProtocol) {
+func getCredentials(plugs []*plugin.Client) {
 	handlePreGetCredentials(plugs)
 	handleGetCredentials(plugs)
 	handlePostGetCredentials(plugs)
 }
 
-func handlePreGetCredentials(plugs []plugin.ClientProtocol) {
-	for _, p := range plugs {
-		pregetcredentialsplugin, ok := p.(hooks.PreGetCredentialsHook)
-		if ok {
-			pregetcredentialsplugin.PreGetCredentials()
-		}
-	}
+func handlePreGetCredentials(plugs []*plugin.Client) {
 
 }
 
-func handleGetCredentials(plugs []plugin.ClientProtocol) {
-	for _, p := range plugs {
-		getcredentialsplugin, ok := p.(hooks.GetCredentialsHook)
-		if ok {
-			getcredentialsplugin.GetCredentials()
-		}
-	}
+func handleGetCredentials(plugs []*plugin.Client) {
 
 }
 
-func handlePostGetCredentials(plugs []plugin.ClientProtocol) {
-	for _, p := range plugs {
-		postgetcredentialsplugin, ok := p.(hooks.PostGetCredentialsHook)
-		if ok {
-			postgetcredentialsplugin.PostGetCredentials()
-		}
-	}
+func handlePostGetCredentials(plugs []*plugin.Client) {
 
 }

@@ -2,9 +2,11 @@ module github.com/catdevman/awsume-go
 
 go 1.18
 
+replace github.com/catdevman/awsume-go/shared => ./shared
+
 require (
-	github.com/catdevman/awsume-go/pkg/hooks v0.0.0-20220713035905-18ec344a2b36
-	github.com/catdevman/awsume-go/shared v0.0.0-20220713035905-18ec344a2b36
+	github.com/catdevman/awsume-go/pkg/hooks v0.0.0-20220729200248-c49e6d35da65
+	github.com/catdevman/awsume-go/shared v0.0.0-20220729200248-c49e6d35da65
 	github.com/hashicorp/go-plugin v1.4.4
 	github.com/rs/zerolog v1.27.0
 	github.com/spf13/cobra v1.5.0
@@ -12,6 +14,7 @@ require (
 )
 
 require (
+	github.com/catdevman/awsume-go/proto v0.0.0-20220729200248-c49e6d35da65 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -22,7 +25,7 @@ require (
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
-	github.com/mitchellh/go-testing-interface v0.0.0-20171004221916-a61a99592b77 // indirect
+	github.com/mitchellh/go-testing-interface v1.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/oklog/run v1.0.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
@@ -36,7 +39,7 @@ require (
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20220519153652-3a47de7e79bd // indirect
-	google.golang.org/grpc v1.46.2 // indirect
+	google.golang.org/grpc v1.48.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

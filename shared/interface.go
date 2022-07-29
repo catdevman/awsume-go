@@ -32,8 +32,8 @@ type ArgumentsService interface {
 
 type ProfilesService interface {
 	Pre() error
-	Get() error
-	Post() error
+	Get() (Profiles, error)
+	Post(Profiles) error
 }
 
 type CredentialsService interface {
@@ -51,7 +51,7 @@ type ProfileNamesService interface {
 //// This is the implementation of plugin.GRPCPlugin so we can serve/consume this.
 //type ArgumentsPlugin struct {
 //	// GRPCPlugin must still implement the Plugin interface
-//	plugin.Plugin
+//	pluginPlugin
 //	// Concrete implementation, written in Go. This is only used for plugins
 //	// that are written in Go.
 //	Impl ArgumentsService

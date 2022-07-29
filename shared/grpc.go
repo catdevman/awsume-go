@@ -47,12 +47,12 @@ func (m *ProfilesServer) Pre(
 func (m *ProfilesServer) Get(
 	ctx context.Context,
 	req *proto.Empty) (*proto.ProfilesMsg, error) {
-	err := m.Impl.Get()
+	_, err := m.Impl.Get()
 	return &proto.ProfilesMsg{}, err
 }
 func (m *ProfilesServer) Post(
 	ctx context.Context,
 	req *proto.ProfilesMsg) (*proto.Empty, error) {
-	err := m.Impl.Post()
+	err := m.Impl.Post(Profiles{})
 	return &proto.Empty{}, err
 }
