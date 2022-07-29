@@ -50,11 +50,11 @@ type ModuleStruct struct {
 	Cmd    *cobra.Command
 	Config *viper.Viper
 	Logger *zerolog.Logger
-	Name   string "accounts"
+	Name   string
 }
 
 func New(a *shared.Awsume) (interface{}, error) {
-	return ModuleStruct{Cmd: a.Cmd, Config: a.Config, Logger: a.Logger}, nil
+	return ModuleStruct{Cmd: a.Cmd, Config: a.Config, Logger: a.Logger, Name: "accounts"}, nil
 
 }
 
@@ -175,7 +175,7 @@ func getAccountsFromArgonaut(ar ListAccountsResponse, flag bool) (shared.Profile
 			for _, v := range VALID_TREK10_ROLES {
 				p = shared.Profile{}
 				fullProfile := fmt.Sprintf("%s-%s", pr.Alias, v)
-				p.RoleArn = fmt.Sprintf("arn:aws:iam::%s:role/trek10-%s", pr.AccountId, v)
+				p.RoleArn = fmt.Sprintf("arn:aws:iam::%s:role/trek10-%s", pr.AccountId, "role")
 				p.SourceProfile = "default" //TODO get from config
 				p.MfaSerial = "arn:aws:iam::800094578424:mfa/lpearson"
 				p.Region = "None"
