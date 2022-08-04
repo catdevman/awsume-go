@@ -22,6 +22,7 @@ func (m *ProfilesClient) Get() (Profiles, error) {
 
 	return Profiles{}, nil
 }
+
 func (m *ProfilesClient) Post(p Profiles) error {
 	_, err := m.client.Post(context.Background(), &proto.ProfilesMsg{})
 	if err != nil {
@@ -50,6 +51,7 @@ func (m *ProfilesServer) Get(
 	_, err := m.Impl.Get()
 	return &proto.ProfilesMsg{}, err
 }
+
 func (m *ProfilesServer) Post(
 	ctx context.Context,
 	req *proto.ProfilesMsg) (*proto.Empty, error) {
@@ -73,8 +75,9 @@ func (m *ArgumentsClient) Get() error {
 
 	return nil
 }
+
 func (m *ArgumentsClient) Post() error {
-	_, err := m.client.Get(context.Background(), &proto.Empty{})
+	_, err := m.client.Post(context.Background(), &proto.ArgumentsMsg{})
 	if err != nil {
 		return err
 	}
@@ -89,21 +92,16 @@ type ArgumentsServer struct {
 	proto.UnimplementedArgumentsServer
 }
 
-func (m *ArgumentsServer) Pre(
-	ctx context.Context,
-	req *proto.Empty) (*proto.Empty, error) {
+func (m *ArgumentsServer) Pre(ctx context.Context, req *proto.Empty) (*proto.Empty, error) {
 	return &proto.Empty{}, m.Impl.Pre()
 }
 
-func (m *ArgumentsServer) Get(
-	ctx context.Context,
-	req *proto.Empty) (*proto.ArgumentsMsg, error) {
+func (m *ArgumentsServer) Get(ctx context.Context, req *proto.Empty) (*proto.ArgumentsMsg, error) {
 	err := m.Impl.Get()
 	return &proto.ArgumentsMsg{}, err
 }
-func (m *ArgumentsServer) Post(
-	ctx context.Context,
-	req *proto.ArgumentsMsg) (*proto.ArgumentsMsg, error) {
+
+func (m *ArgumentsServer) Post(ctx context.Context, req *proto.ArgumentsMsg) (*proto.ArgumentsMsg, error) {
 	err := m.Impl.Post()
 	return &proto.ArgumentsMsg{}, err
 }

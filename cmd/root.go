@@ -148,7 +148,7 @@ func handlePostArgs(plugs []*plugin.Client) {
 			continue
 		}
 		argsplugin := raw.(shared.ArgumentsService)
-		argsplugin.Pre()
+		argsplugin.Post()
 	}
 }
 
