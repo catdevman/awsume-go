@@ -12,15 +12,14 @@ import (
 	"strings"
 
 	"github.com/catdevman/awsume-go/shared"
+	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
-	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
 var plugins []*plugin.Client
-var logger zerolog.Logger
 var profiles shared.Profiles
 
 // rootCmd represents the base command when called without any subcommands
@@ -52,16 +51,11 @@ func init() {
 		panic(err)
 	}
 
-	//zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	//logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}).With().Timestamp().Logger()
-
 	pluginFiles, err := filepath.Glob(strings.Join([]string{home, ".awsume", "plugins", "*"}, string(os.PathSeparator))) // config directory plugins and local plugins in the future
 	if err != nil {
 		panic(err)
 	}
 
-	// We should no longer need a share app to pass around we will use messages over grpc to communicate state back to the main process
-	//awsume := shared.Awsume{Cmd: rootCmd, Config: viper.GetViper(), Logger: &logger}
 	// loop through files and boot them up
 	// TODO: How do I know what to dispense from the RPC client... can they all have the same name like `awsume-plugin`?
 	for _, filename := range pluginFiles {
@@ -70,6 +64,11 @@ func init() {
 			Plugins:          shared.PluginMap,
 			Cmd:              exec.Command("sh", "-c", filename), //TODO: This seems heavy handed can we load these paths from the conf file
 			AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
+			Logger: hclog.New(&hclog.LoggerOptions{
+				Name:   filepath.Base(filename),
+				Output: os.Stderr,
+				Level:  hclog.Debug,
+			}),
 		})
 
 		plugins = append(plugins, client)
@@ -102,14 +101,55 @@ func initConfig() {
 }
 
 func handlePreArgs(plugs []*plugin.Client) {
-
+	for _, p := range plugs {
+		client, err := p.Client()
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		raw, err := client.Dispense("arguments_grpc")
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		argsplugin := raw.(shared.ArgumentsService)
+		argsplugin.Pre()
+	}
 }
 
 func handleArgs(plugs []*plugin.Client) {
+	for _, p := range plugs {
+		client, err := p.Client()
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		raw, err := client.Dispense("arguments_grpc")
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		argsplugin := raw.(shared.ArgumentsService)
+		argsplugin.Get()
+	}
 
 }
 
 func handlePostArgs(plugs []*plugin.Client) {
+	for _, p := range plugs {
+		client, err := p.Client()
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		raw, err := client.Dispense("arguments_grpc")
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		argsplugin := raw.(shared.ArgumentsService)
+		argsplugin.Pre()
+	}
 }
 
 func getProfiles(plugs []*plugin.Client) {
@@ -130,28 +170,50 @@ func handlePreCollectProfiles(plugs []*plugin.Client) {
 			fmt.Println("Error:", err.Error())
 			continue
 		}
-		pregetprofileplugin := raw.(shared.ProfilesService)
-		pregetprofileplugin.Pre()
+		profileplugin := raw.(shared.ProfilesService)
+		profileplugin.Pre()
 	}
 }
 
 func handleCollectProfiles(plugs []*plugin.Client) {
-	//	for _, p := range plugs {
-	//		getprofileplugin, ok := &p.(hooks.CollectProfilesHook)
-	//		if ok {
-	//			// TODO: mutex lock and use go routines
-	//			// or make a profiles channel give to CollecctProfiles
-	//			prs := getprofileplugin.CollectProfiles()
-	//			if profiles == nil {
-	//				profiles = shared.Profiles{}
-	//			}
-	//			fmt.Println(prs)
-	//			profiles = profiles.Add(prs)
-	//		}
-	//	}
+	for _, p := range plugs {
+		client, err := p.Client()
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		raw, err := client.Dispense("profiles_grpc")
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		profileplugin := raw.(shared.ProfilesService)
+		prs, err := profileplugin.Get()
+		if err != nil {
+			continue
+		}
+		if profiles == nil {
+			profiles = shared.Profiles{}
+		}
+		profiles = profiles.Add(prs)
+	}
 }
 
 func handlePostCollectProfiles(plugs []*plugin.Client) {
+	for _, p := range plugs {
+		client, err := p.Client()
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		raw, err := client.Dispense("profiles_grpc")
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		profileplugin := raw.(shared.ProfilesService)
+		profileplugin.Post(profiles)
+	}
 }
 
 func getCredentials(plugs []*plugin.Client) {

@@ -23,7 +23,7 @@ func (m *ProfilesClient) Get() (Profiles, error) {
 	return Profiles{}, nil
 }
 func (m *ProfilesClient) Post(p Profiles) error {
-	_, err := m.client.Get(context.Background(), &proto.Empty{})
+	_, err := m.client.Post(context.Background(), &proto.ProfilesMsg{})
 	if err != nil {
 		return err
 	}
@@ -54,5 +54,56 @@ func (m *ProfilesServer) Post(
 	ctx context.Context,
 	req *proto.ProfilesMsg) (*proto.Empty, error) {
 	err := m.Impl.Post(Profiles{})
+	return &proto.Empty{}, err
+}
+
+// ArgumentsClient is an implementation of KV that talks over RPC.
+type ArgumentsClient struct{ client proto.ArgumentsClient }
+
+func (m *ArgumentsClient) Pre() error {
+	_, err := m.client.Pre(context.Background(), &proto.Empty{})
+	return err
+}
+
+func (m *ArgumentsClient) Get() error {
+	_, err := m.client.Get(context.Background(), &proto.Empty{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+func (m *ArgumentsClient) Post() error {
+	_, err := m.client.Get(context.Background(), &proto.Empty{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Here is the gRPC server that ProfilesClient talks to.
+type ArgumentsServer struct {
+	// This is the real implementation
+	Impl ArgumentsService
+	proto.UnimplementedArgumentsServer
+}
+
+func (m *ArgumentsServer) Pre(
+	ctx context.Context,
+	req *proto.Empty) (*proto.Empty, error) {
+	return &proto.Empty{}, m.Impl.Pre()
+}
+
+func (m *ArgumentsServer) Get(
+	ctx context.Context,
+	req *proto.Empty) (*proto.ArgumentsMsg, error) {
+	err := m.Impl.Get()
+	return &proto.ArgumentsMsg{}, err
+}
+func (m *ArgumentsServer) Post(
+	ctx context.Context,
+	req *proto.ArgumentsMsg) (*proto.Empty, error) {
+	err := m.Impl.Post()
 	return &proto.Empty{}, err
 }

@@ -18,8 +18,8 @@ var Handshake = plugin.HandshakeConfig{
 
 // PluginMap is the map of plugins we can dispense.
 var PluginMap = map[string]plugin.Plugin{
-	//	"args_grpc":          &ArgumentsPlugin{},
-	"profiles_grpc": &ProfilesPlugin{},
+	"arguments_grpc": &ArgumentsPlugin{},
+	"profiles_grpc":  &ProfilesPlugin{},
 	//	"creds_grpc":         &CredentialsPlugin{},
 	//	"profile_names_grpc": &ProfileNamesPlugin{},
 }
@@ -48,24 +48,24 @@ type ProfileNamesService interface {
 	Post() error
 }
 
-//// This is the implementation of plugin.GRPCPlugin so we can serve/consume this.
-//type ArgumentsPlugin struct {
-//	// GRPCPlugin must still implement the Plugin interface
-//	pluginPlugin
-//	// Concrete implementation, written in Go. This is only used for plugins
-//	// that are written in Go.
-//	Impl ArgumentsService
-//	proto.UnimplementedArgumentsServer
-//}
-//
-//func (p *ArgumentsPlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
-//	proto.RegisterArgumentsServer(s, &GRPCServer{Impl: p.Impl})
-//	return nil
-//}
-//
-//func (p *ArgumentsPlugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
-//	return &GRPCClient{client: proto.NewArgumentsClient(c)}, nil
-//}
+// This is the implementation of plugin.GRPCPlugin so we can serve/consume this.
+type ArgumentsPlugin struct {
+	// GRPCPlugin must still implement the Plugin interface
+	plugin.Plugin
+	// Concrete implementation, written in Go. This is only used for plugins
+	// that are written in Go.
+	Impl ArgumentsService
+	proto.UnimplementedArgumentsServer
+}
+
+func (p *ArgumentsPlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
+	proto.RegisterArgumentsServer(s, &ArgumentsServer{Impl: p.Impl})
+	return nil
+}
+
+func (p *ArgumentsPlugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
+	return &ArgumentsClient{client: proto.NewArgumentsClient(c)}, nil
+}
 
 // This is the implementation of plugin.GRPCPlugin so we can serve/consume this.
 type ProfilesPlugin struct {

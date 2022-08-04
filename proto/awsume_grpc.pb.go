@@ -24,7 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type ArgumentsClient interface {
 	Pre(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
 	Get(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ArgumentsMsg, error)
-	Post(ctx context.Context, in *ArgumentsMsg, opts ...grpc.CallOption) (*Empty, error)
+	Post(ctx context.Context, in *ArgumentsMsg, opts ...grpc.CallOption) (*ArgumentsMsg, error)
 }
 
 type argumentsClient struct {
@@ -53,8 +53,8 @@ func (c *argumentsClient) Get(ctx context.Context, in *Empty, opts ...grpc.CallO
 	return out, nil
 }
 
-func (c *argumentsClient) Post(ctx context.Context, in *ArgumentsMsg, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *argumentsClient) Post(ctx context.Context, in *ArgumentsMsg, opts ...grpc.CallOption) (*ArgumentsMsg, error) {
+	out := new(ArgumentsMsg)
 	err := c.cc.Invoke(ctx, "/proto.Arguments/Post", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (c *argumentsClient) Post(ctx context.Context, in *ArgumentsMsg, opts ...gr
 type ArgumentsServer interface {
 	Pre(context.Context, *Empty) (*Empty, error)
 	Get(context.Context, *Empty) (*ArgumentsMsg, error)
-	Post(context.Context, *ArgumentsMsg) (*Empty, error)
+	Post(context.Context, *ArgumentsMsg) (*ArgumentsMsg, error)
 	mustEmbedUnimplementedArgumentsServer()
 }
 
@@ -82,7 +82,7 @@ func (UnimplementedArgumentsServer) Pre(context.Context, *Empty) (*Empty, error)
 func (UnimplementedArgumentsServer) Get(context.Context, *Empty) (*ArgumentsMsg, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
-func (UnimplementedArgumentsServer) Post(context.Context, *ArgumentsMsg) (*Empty, error) {
+func (UnimplementedArgumentsServer) Post(context.Context, *ArgumentsMsg) (*ArgumentsMsg, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Post not implemented")
 }
 func (UnimplementedArgumentsServer) mustEmbedUnimplementedArgumentsServer() {}

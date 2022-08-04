@@ -19,10 +19,10 @@ message ProfilesMsg {
 }
 
 message Argument {
-    string type = 1;
-    string value = 2;
-    string name = 3;
-    string flag = 4;
+    string Type = 1;
+    string Value = 2;
+    string Name = 3;
+    string Flag = 4;
 }
 
 message ArgumentsMsg {
@@ -33,7 +33,7 @@ message Empty {}
 service Arguments {
     rpc Pre(Empty) returns (Empty);
     rpc Get(Empty) returns (ArgumentsMsg);
-    rpc Post(ArgumentsMsg) returns (Empty);
+    rpc Post(ArgumentsMsg) returns (ArgumentsMsg);
 }
 
 service Profiles {
