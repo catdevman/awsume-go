@@ -103,7 +103,7 @@ func (m *ArgumentsServer) Get(
 }
 func (m *ArgumentsServer) Post(
 	ctx context.Context,
-	req *proto.ArgumentsMsg) (*proto.Empty, error) {
+	req *proto.ArgumentsMsg) (*proto.ArgumentsMsg, error) {
 	err := m.Impl.Post()
-	return &proto.Empty{}, err
+	return &proto.ArgumentsMsg{}, err
 }
