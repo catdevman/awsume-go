@@ -20,7 +20,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
-          pre_command: "export CGO_ENABLED=1 && go env"
+          pre_command: "export CGO_ENABLED=0 && go env"
           binary_name: "awsume"
           ldflags: "-s -w"
           extra_files: LICENSE README.md

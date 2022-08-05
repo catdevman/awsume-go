@@ -223,13 +223,52 @@ func getCredentials(plugs []*plugin.Client) {
 }
 
 func handlePreGetCredentials(plugs []*plugin.Client) {
-
+	for _, p := range plugs {
+		client, err := p.Client()
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		raw, err := client.Dispense("credentials_grpc")
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		profileplugin := raw.(shared.CredentialsService)
+		profileplugin.Pre()
+	}
 }
 
 func handleGetCredentials(plugs []*plugin.Client) {
-
+	for _, p := range plugs {
+		client, err := p.Client()
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		raw, err := client.Dispense("credentials_grpc")
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		profileplugin := raw.(shared.CredentialsService)
+		profileplugin.Get()
+	}
 }
 
 func handlePostGetCredentials(plugs []*plugin.Client) {
-
+	for _, p := range plugs {
+		client, err := p.Client()
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		raw, err := client.Dispense("credentials_grpc")
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		profileplugin := raw.(shared.CredentialsService)
+		profileplugin.Post()
+	}
 }
