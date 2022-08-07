@@ -14,6 +14,15 @@ type Awsume struct {
 	Logger *zerolog.Logger
 }
 
+type Argument struct {
+	Type  string
+	Value string
+	Name  string
+	Flag  string
+}
+
+type Arguments []Argument
+
 type Profile struct {
 	RoleArn            string
 	SourceProfile      string

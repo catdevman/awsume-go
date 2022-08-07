@@ -26,8 +26,8 @@ var PluginMap = map[string]plugin.Plugin{
 
 type ArgumentsService interface {
 	Pre() error
-	Get() error
-	Post() error
+	Get() (Arguments, error)
+	Post(Arguments) (Arguments, error)
 }
 
 type ProfilesService interface {

@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -131,7 +132,8 @@ func handleArgs(plugs []*plugin.Client) {
 			continue
 		}
 		argsplugin := raw.(shared.ArgumentsService)
-		argsplugin.Get()
+		args, err := argsplugin.Get()
+		log.Println(args, err)
 	}
 
 }
@@ -149,7 +151,7 @@ func handlePostArgs(plugs []*plugin.Client) {
 			continue
 		}
 		argsplugin := raw.(shared.ArgumentsService)
-		argsplugin.Post()
+		argsplugin.Post(shared.Arguments{})
 	}
 }
 

@@ -2,6 +2,8 @@ package shared
 
 import (
 	"context"
+	"fmt"
+	"log"
 
 	"github.com/catdevman/awsume-go/proto"
 )
@@ -14,22 +16,25 @@ func (m *ArgumentsClient) Pre() error {
 	return err
 }
 
-func (m *ArgumentsClient) Get() error {
-	_, err := m.client.Get(context.Background(), &proto.Empty{})
+func (m *ArgumentsClient) Get() (Arguments, error) {
+	argsMsg, err := m.client.Get(context.Background(), &proto.Empty{})
 	if err != nil {
-		return err
+		return Arguments{}, err
 	}
 
-	return nil
+	log.Println(fmt.Sprintf("%+v", argsMsg))
+
+	//TODO: convert argsMsg to shared Arguments slice
+	return Arguments{Argument{Type: "string", Value: "", Name: "important", Flag: "important"}}, nil
 }
 
-func (m *ArgumentsClient) Post() error {
+func (m *ArgumentsClient) Post(Arguments) (Arguments, error) {
 	_, err := m.client.Post(context.Background(), &proto.ArgumentsMsg{})
 	if err != nil {
-		return err
+		return Arguments{}, err
 	}
 
-	return nil
+	return Arguments{}, nil
 }
 
 // Here is the gRPC server that ProfilesClient talks to.
@@ -44,12 +49,14 @@ func (m *ArgumentsServer) Pre(ctx context.Context, req *proto.Empty) (*proto.Emp
 }
 
 func (m *ArgumentsServer) Get(ctx context.Context, req *proto.Empty) (*proto.ArgumentsMsg, error) {
-	err := m.Impl.Get()
+	_, err := m.Impl.Get()
+	//TODO: Turn shared Arguments into proto ArgumentsMsg
 	return &proto.ArgumentsMsg{}, err
 }
 
 func (m *ArgumentsServer) Post(ctx context.Context, req *proto.ArgumentsMsg) (*proto.ArgumentsMsg, error) {
-	err := m.Impl.Post()
+	_, err := m.Impl.Post(Arguments{})
+	//TODO: Turn shared Arguments into proto ArgumentsMsg
 	return &proto.ArgumentsMsg{}, err
 }
 

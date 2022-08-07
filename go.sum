@@ -43,6 +43,8 @@ github.com/catdevman/awsume-go/proto v0.0.0-20220806000634-fccd30e068db h1:2desq
 github.com/catdevman/awsume-go/proto v0.0.0-20220806000634-fccd30e068db/go.mod h1:p026zJBPDHf/i2XAyqE3E+CtfYOwHSPQ6RCalVwwNas=
 github.com/catdevman/awsume-go/proto v0.0.0-20220807124436-f877dadab706 h1:9WijUYuDSszRdZjo8WhCnBu+4diB+4UTovDHt6/+kus=
 github.com/catdevman/awsume-go/proto v0.0.0-20220807124436-f877dadab706/go.mod h1:OzWDoK+87wA/FMJcXFrA0C77sJeyFcMZIttIPVSQpI8=
+github.com/catdevman/awsume-go/proto v0.0.0-20220807153440-c58b5b69ee5d h1:1YyOHHTU2SsNMfq83AHwT7vhRS2PtluNW18FUZ6fIF8=
+github.com/catdevman/awsume-go/proto v0.0.0-20220807153440-c58b5b69ee5d/go.mod h1:OzWDoK+87wA/FMJcXFrA0C77sJeyFcMZIttIPVSQpI8=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
@@ -150,6 +152,8 @@ github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
+github.com/inconshreveable/mousetrap v1.0.1 h1:U3uMjPSQEBMNp1lFxmllqCPM6P5u/Xq7Pgzkat/bFNc=
+github.com/inconshreveable/mousetrap v1.0.1/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024/go.mod h1:6v2b51hI/fHJwM22ozAgKL4VKDeJcHhJFhtBdhmNjmU=
 github.com/jstemmer/go-junit-report v0.9.1/go.mod h1:Brl9GWCQeLvo8nXZwPNNblvFj/XSXhF0NWZEnDohbsk=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
