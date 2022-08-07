@@ -32,6 +32,7 @@ var rootCmd = &cobra.Command{
 		handlePostArgs(plugins)
 		getProfiles(plugins)
 		getCredentials(plugins)
+		getProfileNames(plugins)
 	},
 }
 
@@ -270,5 +271,21 @@ func handlePostGetCredentials(plugs []*plugin.Client) {
 		}
 		profileplugin := raw.(shared.CredentialsService)
 		profileplugin.Post()
+	}
+}
+func getProfileNames(plugs []*plugin.Client) {
+	for _, p := range plugs {
+		client, err := p.Client()
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		raw, err := client.Dispense("profile_names_grpc")
+		if err != nil {
+			fmt.Println("Error:", err.Error())
+			continue
+		}
+		profileplugin := raw.(shared.ProfileNamesService)
+		profileplugin.Get()
 	}
 }

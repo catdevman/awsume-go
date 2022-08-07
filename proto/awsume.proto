@@ -28,6 +28,7 @@ message Argument {
 message ArgumentsMsg {
     repeated Argument arguments = 1;
 }
+
 message Empty {}
 
 service Arguments {
@@ -49,7 +50,5 @@ service Credentials {
 }
 
 service ProfileNames {
-    rpc Pre(Empty) returns (Empty);
     rpc Get(Empty) returns (Empty);
-    rpc Post(Empty) returns (Empty);
 }

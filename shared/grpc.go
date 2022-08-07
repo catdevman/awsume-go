@@ -156,3 +156,28 @@ func (m *CredentialsServer) Post(
 	req *proto.Empty) (*proto.Empty, error) {
 	return &proto.Empty{}, m.Impl.Post()
 }
+
+// ProfileNamesClient is an implementation of KV that talks over RPC.
+type ProfileNamesClient struct{ client proto.ProfileNamesClient }
+
+func (m *ProfileNamesClient) Get() error {
+	_, err := m.client.Get(context.Background(), &proto.Empty{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Here is the gRPC server that ProfilesClient talks to.
+type ProfileNamesServer struct {
+	// This is the real implementation
+	Impl ProfileNamesService
+	proto.UnimplementedProfileNamesServer
+}
+
+func (m *ProfileNamesServer) Get(
+	ctx context.Context,
+	req *proto.Empty) (*proto.Empty, error) {
+	return &proto.Empty{}, m.Impl.Get()
+}

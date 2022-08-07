@@ -18,10 +18,10 @@ var Handshake = plugin.HandshakeConfig{
 
 // PluginMap is the map of plugins we can dispense.
 var PluginMap = map[string]plugin.Plugin{
-	"arguments_grpc":   &ArgumentsPlugin{},
-	"profiles_grpc":    &ProfilesPlugin{},
-	"credentials_grpc": &CredentialsPlugin{},
-	//	"profile_names_grpc": &ProfileNamesPlugin{},
+	"arguments_grpc":     &ArgumentsPlugin{},
+	"profiles_grpc":      &ProfilesPlugin{},
+	"credentials_grpc":   &CredentialsPlugin{},
+	"profile_names_grpc": &ProfileNamesPlugin{},
 }
 
 type ArgumentsService interface {
@@ -43,9 +43,7 @@ type CredentialsService interface {
 }
 
 type ProfileNamesService interface {
-	Pre() error
 	Get() error
-	Post() error
 }
 
 // This is the implementation of plugin.GRPCPlugin so we can serve/consume this.
@@ -106,20 +104,20 @@ func (p *CredentialsPlugin) GRPCClient(ctx context.Context, broker *plugin.GRPCB
 }
 
 // This is the implementation of plugin.GRPCPlugin so we can serve/consume this.
-//type ProfileNamesPlugin struct {
-//	// GRPCPlugin must still implement the Plugin interface
-//	plugin.Plugin
-//	// Concrete implementation, written in Go. This is only used for plugins
-//	// that are written in Go.
-//	Impl ProfileNamesService
-//	proto.UnimplementedProfileNamesServer
-//}
-//
-//func (p *ProfileNamesPlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
-//	proto.RegisterProfileNamesServer(s, &GRPCServer{Impl: p.Impl})
-//	return nil
-//}
-//
-//func (p *ProfileNamesPlugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
-//	return &GRPCClient{client: proto.NewProfileNamesClient(c)}, nil
-//}
+type ProfileNamesPlugin struct {
+	// GRPCPlugin must still implement the Plugin interface
+	plugin.Plugin
+	// Concrete implementation, written in Go. This is only used for plugins
+	// that are written in Go.
+	Impl ProfileNamesService
+	proto.UnimplementedProfileNamesServer
+}
+
+func (p *ProfileNamesPlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
+	proto.RegisterProfileNamesServer(s, &ProfileNamesServer{Impl: p.Impl})
+	return nil
+}
+
+func (p *ProfileNamesPlugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
+	return &ProfileNamesClient{client: proto.NewProfileNamesClient(c)}, nil
+}

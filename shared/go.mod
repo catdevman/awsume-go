@@ -3,7 +3,7 @@ module github.com/catdevman/awsume-go/shared
 go 1.17
 
 require (
-	github.com/catdevman/awsume-go/proto v0.0.0-20220804034907-18f554631c35
+	github.com/catdevman/awsume-go/proto v0.0.0-20220806000634-fccd30e068db
 	github.com/hashicorp/go-plugin v1.4.4
 	github.com/rs/zerolog v1.27.0
 	github.com/spf13/cobra v1.5.0

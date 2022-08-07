@@ -496,9 +496,7 @@ var Credentials_ServiceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProfileNamesClient interface {
-	Pre(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
 	Get(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
-	Post(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type profileNamesClient struct {
@@ -507,15 +505,6 @@ type profileNamesClient struct {
 
 func NewProfileNamesClient(cc grpc.ClientConnInterface) ProfileNamesClient {
 	return &profileNamesClient{cc}
-}
-
-func (c *profileNamesClient) Pre(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/proto.ProfileNames/Pre", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *profileNamesClient) Get(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
@@ -527,22 +516,11 @@ func (c *profileNamesClient) Get(ctx context.Context, in *Empty, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *profileNamesClient) Post(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/proto.ProfileNames/Post", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // ProfileNamesServer is the server API for ProfileNames service.
 // All implementations must embed UnimplementedProfileNamesServer
 // for forward compatibility
 type ProfileNamesServer interface {
-	Pre(context.Context, *Empty) (*Empty, error)
 	Get(context.Context, *Empty) (*Empty, error)
-	Post(context.Context, *Empty) (*Empty, error)
 	mustEmbedUnimplementedProfileNamesServer()
 }
 
@@ -550,14 +528,8 @@ type ProfileNamesServer interface {
 type UnimplementedProfileNamesServer struct {
 }
 
-func (UnimplementedProfileNamesServer) Pre(context.Context, *Empty) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Pre not implemented")
-}
 func (UnimplementedProfileNamesServer) Get(context.Context, *Empty) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
-}
-func (UnimplementedProfileNamesServer) Post(context.Context, *Empty) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Post not implemented")
 }
 func (UnimplementedProfileNamesServer) mustEmbedUnimplementedProfileNamesServer() {}
 
@@ -570,24 +542,6 @@ type UnsafeProfileNamesServer interface {
 
 func RegisterProfileNamesServer(s grpc.ServiceRegistrar, srv ProfileNamesServer) {
 	s.RegisterService(&ProfileNames_ServiceDesc, srv)
-}
-
-func _ProfileNames_Pre_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProfileNamesServer).Pre(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.ProfileNames/Pre",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileNamesServer).Pre(ctx, req.(*Empty))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _ProfileNames_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -608,24 +562,6 @@ func _ProfileNames_Get_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ProfileNames_Post_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProfileNamesServer).Post(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.ProfileNames/Post",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileNamesServer).Post(ctx, req.(*Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // ProfileNames_ServiceDesc is the grpc.ServiceDesc for ProfileNames service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -634,16 +570,8 @@ var ProfileNames_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ProfileNamesServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Pre",
-			Handler:    _ProfileNames_Pre_Handler,
-		},
-		{
 			MethodName: "Get",
 			Handler:    _ProfileNames_Get_Handler,
-		},
-		{
-			MethodName: "Post",
-			Handler:    _ProfileNames_Post_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
