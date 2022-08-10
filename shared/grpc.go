@@ -21,11 +21,19 @@ func (m *ArgumentsClient) Get() (Arguments, error) {
 	if err != nil {
 		return Arguments{}, err
 	}
-
+	args := Arguments{}
 	log.Println(fmt.Sprintf("%+v", argsMsg))
+	for _, v := range argsMsg.Arguments {
+		log.Println(v)
+		arg := Argument{}
+		arg.Flag = v.Flag
+		arg.Name = v.Name
+		arg.Type = v.Type
+		arg.Value = v.Value
+		args = append(args, arg)
+	}
 
-	//TODO: convert argsMsg to shared Arguments slice
-	return Arguments{Argument{Type: "string", Value: "", Name: "important", Flag: "important"}}, nil
+	return args, nil
 }
 
 func (m *ArgumentsClient) Post(Arguments) (Arguments, error) {
