@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ArgumentsClient interface {
 	Pre(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
-	Get(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ArgumentsMsg, error)
+	Get(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*SingleString, error)
 	Post(ctx context.Context, in *ArgumentsMsg, opts ...grpc.CallOption) (*ArgumentsMsg, error)
 }
 
@@ -44,8 +44,8 @@ func (c *argumentsClient) Pre(ctx context.Context, in *Empty, opts ...grpc.CallO
 	return out, nil
 }
 
-func (c *argumentsClient) Get(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ArgumentsMsg, error) {
-	out := new(ArgumentsMsg)
+func (c *argumentsClient) Get(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*SingleString, error) {
+	out := new(SingleString)
 	err := c.cc.Invoke(ctx, "/proto.Arguments/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func (c *argumentsClient) Post(ctx context.Context, in *ArgumentsMsg, opts ...gr
 // for forward compatibility
 type ArgumentsServer interface {
 	Pre(context.Context, *Empty) (*Empty, error)
-	Get(context.Context, *Empty) (*ArgumentsMsg, error)
+	Get(context.Context, *Empty) (*SingleString, error)
 	Post(context.Context, *ArgumentsMsg) (*ArgumentsMsg, error)
 	mustEmbedUnimplementedArgumentsServer()
 }
@@ -79,7 +79,7 @@ type UnimplementedArgumentsServer struct {
 func (UnimplementedArgumentsServer) Pre(context.Context, *Empty) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Pre not implemented")
 }
-func (UnimplementedArgumentsServer) Get(context.Context, *Empty) (*ArgumentsMsg, error) {
+func (UnimplementedArgumentsServer) Get(context.Context, *Empty) (*SingleString, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
 func (UnimplementedArgumentsServer) Post(context.Context, *ArgumentsMsg) (*ArgumentsMsg, error) {
