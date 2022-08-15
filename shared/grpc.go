@@ -19,7 +19,7 @@ func (m *ArgumentsClient) Pre() error {
 	return err
 }
 
-func (m *ArgumentsClient) Get() (Arguments, error) {
+func (m *ArgumentsClient) Get() (*proto.ArgumentsClient, error) {
 	argsMsg, err := m.client.Get(context.Background(), &proto.Empty{})
 	if err != nil {
 		m.logger.Error(err.Error())
@@ -35,16 +35,16 @@ func (m *ArgumentsClient) Get() (Arguments, error) {
 		arg.Value = v.Value
 		args = append(args, arg)
 	}
-	return args, nil
+	return argsMsg, nil
 }
 
-func (m *ArgumentsClient) Post(Arguments) (Arguments, error) {
-	_, err := m.client.Post(context.Background(), &proto.ArgumentsMsg{})
+func (m *ArgumentsClient) Post(argsMsg *proto.ArgumentsMsg) (*proto.ArgumentsMsg, error) {
+	args, err := m.client.Post(context.Background(), argsMsg)
 	if err != nil {
-		return Arguments{}, err
+		return &proto.ArgumentsMsg{}, err
 	}
 
-	return Arguments{}, nil
+	return args, nil
 }
 
 // Here is the gRPC server that ProfilesClient talks to.
