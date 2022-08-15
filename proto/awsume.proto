@@ -29,10 +29,6 @@ message ArgumentsMsg {
     repeated Argument arguments = 1;
 }
 
-message SingleString{
-    Message string Message = 1;
-}
-
 message Empty {}
 
 service Arguments {
