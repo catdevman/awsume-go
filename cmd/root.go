@@ -66,7 +66,6 @@ func init() {
 
 	// loop through files and boot them up
 	for _, filename := range pluginFiles {
-		logger.Debug(filename)
 		client := plugin.NewClient(&plugin.ClientConfig{
 			HandshakeConfig:  shared.Handshake,
 			Plugins:          shared.PluginMap,

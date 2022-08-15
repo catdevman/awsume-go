@@ -2,7 +2,6 @@ package shared
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/catdevman/awsume-go/proto"
 	"github.com/hashicorp/go-hclog"
@@ -25,7 +24,6 @@ func (m *ArgumentsClient) Get() (*proto.ArgumentsMsg, error) {
 		m.logger.Error(err.Error())
 		return &proto.ArgumentsMsg{}, err
 	}
-	m.logger.Debug(fmt.Sprintf("Hello %+v", argsMsg))
 	return argsMsg, nil
 }
 
@@ -52,13 +50,11 @@ func (m *ArgumentsServer) Pre(ctx context.Context, req *proto.Empty) (*proto.Emp
 
 func (m *ArgumentsServer) Get(ctx context.Context, req *proto.Empty) (*proto.ArgumentsMsg, error) {
 	args, err := m.Impl.Get()
-	m.logger.Debug("ArgsServer.Get" + fmt.Sprintf("%+v", args))
 	return args, err
 }
 
 func (m *ArgumentsServer) Post(ctx context.Context, req *proto.ArgumentsMsg) (*proto.ArgumentsMsg, error) {
 	argsMsg, err := m.Impl.Post(&proto.ArgumentsMsg{})
-	m.logger.Debug(fmt.Sprintf("%+v", argsMsg))
 	//TODO: Turn shared Arguments into proto ArgumentsMsg
 	return argsMsg, err
 }
