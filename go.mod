@@ -5,7 +5,7 @@ go 1.18
 replace github.com/catdevman/awsume-go/shared => ./shared
 
 require (
-	github.com/catdevman/awsume-go/shared v0.0.0-20220807211849-e60ac121b226
+	github.com/catdevman/awsume-go/shared v0.0.0-20220815005709-26351abc32d6
 	github.com/hashicorp/go-hclog v1.2.2
 	github.com/hashicorp/go-plugin v1.4.4
 	github.com/spf13/cobra v1.5.0
@@ -13,7 +13,7 @@ require (
 )
 
 require (
-	github.com/catdevman/awsume-go/proto v0.0.0-20220807211849-e60ac121b226 // indirect
+	github.com/catdevman/awsume-go/proto v0.0.0-20220815005709-26351abc32d6 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -34,10 +34,10 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.0 // indirect
-	golang.org/x/net v0.0.0-20220809184613-07c6da5e1ced // indirect
-	golang.org/x/sys v0.0.0-20220808155132-1c4a2a72c664 // indirect
+	golang.org/x/net v0.0.0-20220812174116-3211cb980234 // indirect
+	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
 	golang.org/x/text v0.3.7 // indirect
-	google.golang.org/genproto v0.0.0-20220808204814-fd01256a5276 // indirect
+	google.golang.org/genproto v0.0.0-20220812140447-cec7f5303424 // indirect
 	google.golang.org/grpc v1.48.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect

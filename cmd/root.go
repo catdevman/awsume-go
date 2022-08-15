@@ -6,7 +6,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -22,6 +21,7 @@ import (
 var cfgFile string
 var plugins []*plugin.Client
 var profiles shared.Profiles
+var logger hclog.Logger
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -57,20 +57,21 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+	logger = hclog.New(&hclog.LoggerOptions{
+		Name:   "awsume",
+		Output: os.Stderr,
+		Level:  hclog.Debug,
+	})
 
 	// loop through files and boot them up
-	// TODO: How do I know what to dispense from the RPC client... can they all have the same name like `awsume-plugin`?
 	for _, filename := range pluginFiles {
+		logger.Debug(filename)
 		client := plugin.NewClient(&plugin.ClientConfig{
 			HandshakeConfig:  shared.Handshake,
 			Plugins:          shared.PluginMap,
 			Cmd:              exec.Command("sh", "-c", filename), //TODO: This seems heavy handed can we load these paths from the conf file
 			AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
-			Logger: hclog.New(&hclog.LoggerOptions{
-				Name:   filepath.Base(filename),
-				Output: os.Stderr,
-				Level:  hclog.Debug,
-			}),
+			Logger:           logger,
 		})
 
 		plugins = append(plugins, client)
@@ -133,7 +134,7 @@ func handleArgs(plugs []*plugin.Client) {
 		}
 		argsplugin := raw.(shared.ArgumentsService)
 		args, err := argsplugin.Get()
-		log.Println(args, err)
+		logger.Debug(fmt.Sprint("root Args get", args, err))
 	}
 
 }
