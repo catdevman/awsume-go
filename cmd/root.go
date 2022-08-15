@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/catdevman/awsume-go/proto"
 	"github.com/catdevman/awsume-go/shared"
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
@@ -152,7 +153,7 @@ func handlePostArgs(plugs []*plugin.Client) {
 			continue
 		}
 		argsplugin := raw.(shared.ArgumentsService)
-		argsplugin.Post(shared.Arguments{})
+		argsplugin.Post(&proto.ArgumentsMsg{})
 	}
 }
 

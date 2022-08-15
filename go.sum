@@ -51,6 +51,8 @@ github.com/catdevman/awsume-go/proto v0.0.0-20220810004632-81555f6e7c35 h1:WozAt
 github.com/catdevman/awsume-go/proto v0.0.0-20220810004632-81555f6e7c35/go.mod h1:OzWDoK+87wA/FMJcXFrA0C77sJeyFcMZIttIPVSQpI8=
 github.com/catdevman/awsume-go/proto v0.0.0-20220815005709-26351abc32d6 h1:cP6ivhIFbs01T44gBfmRfsHdGpbKL82iPj3CnE+XO+o=
 github.com/catdevman/awsume-go/proto v0.0.0-20220815005709-26351abc32d6/go.mod h1:OzWDoK+87wA/FMJcXFrA0C77sJeyFcMZIttIPVSQpI8=
+github.com/catdevman/awsume-go/proto v0.0.0-20220815011557-5043e95a75a4 h1:3mgW/u8NjuMRsnoJkkIMY9GBtHLZXPws15JWIxZsnNs=
+github.com/catdevman/awsume-go/proto v0.0.0-20220815011557-5043e95a75a4/go.mod h1:OzWDoK+87wA/FMJcXFrA0C77sJeyFcMZIttIPVSQpI8=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=

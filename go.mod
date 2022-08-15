@@ -5,7 +5,7 @@ go 1.18
 replace github.com/catdevman/awsume-go/shared => ./shared
 
 require (
-	github.com/catdevman/awsume-go/shared v0.0.0-20220815005709-26351abc32d6
+	github.com/catdevman/awsume-go/shared v0.0.0-20220815010235-9af97c0634fb
 	github.com/hashicorp/go-hclog v1.2.2
 	github.com/hashicorp/go-plugin v1.4.4
 	github.com/spf13/cobra v1.5.0
@@ -13,7 +13,7 @@ require (
 )
 
 require (
-	github.com/catdevman/awsume-go/proto v0.0.0-20220815005709-26351abc32d6 // indirect
+	github.com/catdevman/awsume-go/proto v0.0.0-20220815011557-5043e95a75a4 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

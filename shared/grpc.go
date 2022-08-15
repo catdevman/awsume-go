@@ -19,22 +19,13 @@ func (m *ArgumentsClient) Pre() error {
 	return err
 }
 
-func (m *ArgumentsClient) Get() (*proto.ArgumentsClient, error) {
+func (m *ArgumentsClient) Get() (*proto.ArgumentsMsg, error) {
 	argsMsg, err := m.client.Get(context.Background(), &proto.Empty{})
 	if err != nil {
 		m.logger.Error(err.Error())
-		return Arguments{}, err
+		return &proto.ArgumentsMsg{}, err
 	}
 	m.logger.Debug(fmt.Sprintf("Hello %+v", argsMsg))
-	args := Arguments{}
-	for _, v := range argsMsg.Arguments {
-		arg := Argument{}
-		arg.Flag = v.Flag
-		arg.Name = v.Name
-		arg.Type = v.Type
-		arg.Value = v.Value
-		args = append(args, arg)
-	}
 	return argsMsg, nil
 }
 
