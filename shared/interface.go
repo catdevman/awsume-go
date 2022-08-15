@@ -2,8 +2,10 @@ package shared
 
 import (
 	"context"
+	"os"
 
 	"github.com/catdevman/awsume-go/proto"
+	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
 	"google.golang.org/grpc"
 )
@@ -26,8 +28,8 @@ var PluginMap = map[string]plugin.Plugin{
 
 type ArgumentsService interface {
 	Pre() error
-	Get() (Arguments, error)
-	Post(Arguments) (Arguments, error)
+	Get() (*proto.ArgumentsMsg, error)
+	Post(*proto.ArgumentsMsg) (*proto.ArgumentsMsg, error)
 }
 
 type ProfilesService interface {
@@ -57,12 +59,25 @@ type ArgumentsPlugin struct {
 }
 
 func (p *ArgumentsPlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
-	proto.RegisterArgumentsServer(s, &ArgumentsServer{Impl: p.Impl})
+	proto.RegisterArgumentsServer(s, &ArgumentsServer{
+		Impl: p.Impl,
+		logger: hclog.New(&hclog.LoggerOptions{
+			Level:  hclog.Trace,
+			Output: os.Stderr,
+			Name:   "ArgumentsServer",
+		}),
+	})
 	return nil
 }
 
 func (p *ArgumentsPlugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
-	return &ArgumentsClient{client: proto.NewArgumentsClient(c)}, nil
+	return &ArgumentsClient{
+		client: proto.NewArgumentsClient(c),
+		logger: hclog.New(&hclog.LoggerOptions{
+			Level:  hclog.Trace,
+			Output: os.Stderr,
+			Name:   "ArgumentsClient",
+		})}, nil
 }
 
 // This is the implementation of plugin.GRPCPlugin so we can serve/consume this.

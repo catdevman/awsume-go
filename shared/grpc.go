@@ -3,13 +3,16 @@ package shared
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/catdevman/awsume-go/proto"
+	"github.com/hashicorp/go-hclog"
 )
 
 // ArgumentsClient is an implementation of KV that talks over RPC.
-type ArgumentsClient struct{ client proto.ArgumentsClient }
+type ArgumentsClient struct {
+	client proto.ArgumentsClient
+	logger hclog.Logger
+}
 
 func (m *ArgumentsClient) Pre() error {
 	_, err := m.client.Pre(context.Background(), &proto.Empty{})
@@ -19,12 +22,12 @@ func (m *ArgumentsClient) Pre() error {
 func (m *ArgumentsClient) Get() (Arguments, error) {
 	argsMsg, err := m.client.Get(context.Background(), &proto.Empty{})
 	if err != nil {
+		m.logger.Error(err.Error())
 		return Arguments{}, err
 	}
+	m.logger.Debug(fmt.Sprintf("Hello %+v", argsMsg))
 	args := Arguments{}
-	log.Println(fmt.Sprintf("%+v", argsMsg))
 	for _, v := range argsMsg.Arguments {
-		log.Println(v)
 		arg := Argument{}
 		arg.Flag = v.Flag
 		arg.Name = v.Name
@@ -32,7 +35,6 @@ func (m *ArgumentsClient) Get() (Arguments, error) {
 		arg.Value = v.Value
 		args = append(args, arg)
 	}
-
 	return args, nil
 }
 
@@ -50,6 +52,7 @@ type ArgumentsServer struct {
 	// This is the real implementation
 	Impl ArgumentsService
 	proto.UnimplementedArgumentsServer
+	logger hclog.Logger
 }
 
 func (m *ArgumentsServer) Pre(ctx context.Context, req *proto.Empty) (*proto.Empty, error) {
@@ -57,15 +60,16 @@ func (m *ArgumentsServer) Pre(ctx context.Context, req *proto.Empty) (*proto.Emp
 }
 
 func (m *ArgumentsServer) Get(ctx context.Context, req *proto.Empty) (*proto.ArgumentsMsg, error) {
-	_, err := m.Impl.Get()
-	//TODO: Turn shared Arguments into proto ArgumentsMsg
-	return &proto.ArgumentsMsg{}, err
+	args, err := m.Impl.Get()
+	m.logger.Debug("ArgsServer.Get" + fmt.Sprintf("%+v", args))
+	return args, err
 }
 
 func (m *ArgumentsServer) Post(ctx context.Context, req *proto.ArgumentsMsg) (*proto.ArgumentsMsg, error) {
-	_, err := m.Impl.Post(Arguments{})
+	argsMsg, err := m.Impl.Post(&proto.ArgumentsMsg{})
+	m.logger.Debug(fmt.Sprintf("%+v", argsMsg))
 	//TODO: Turn shared Arguments into proto ArgumentsMsg
-	return &proto.ArgumentsMsg{}, err
+	return argsMsg, err
 }
 
 // ProfilesClient is an implementation of KV that talks over RPC.
