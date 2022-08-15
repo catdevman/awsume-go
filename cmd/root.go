@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/catdevman/awsume-go/proto"
 	"github.com/catdevman/awsume-go/shared"
@@ -35,6 +36,7 @@ var rootCmd = &cobra.Command{
 		getProfiles(plugins)
 		getCredentials(plugins)
 		getProfileNames(plugins)
+		time.Sleep(time.Millisecond * 100)
 	},
 }
 

@@ -2,11 +2,13 @@ module github.com/catdevman/awsume-go
 
 go 1.18
 
+replace github.com/catdevman/awsume-go/proto => ./proto
+
 replace github.com/catdevman/awsume-go/shared => ./shared
 
 require (
-	github.com/catdevman/awsume-go/proto v0.0.0-20220815005709-26351abc32d6
-	github.com/catdevman/awsume-go/shared v0.0.0-20220815005709-26351abc32d6
+	github.com/catdevman/awsume-go/proto v0.0.0-20220815014318-c8bba163142a
+	github.com/catdevman/awsume-go/shared v0.0.0-20220815014318-c8bba163142a
 	github.com/hashicorp/go-hclog v1.2.2
 	github.com/hashicorp/go-plugin v1.4.4
 	github.com/spf13/cobra v1.5.0

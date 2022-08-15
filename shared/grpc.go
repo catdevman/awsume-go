@@ -54,7 +54,7 @@ func (m *ArgumentsServer) Get(ctx context.Context, req *proto.Empty) (*proto.Arg
 }
 
 func (m *ArgumentsServer) Post(ctx context.Context, req *proto.ArgumentsMsg) (*proto.ArgumentsMsg, error) {
-	argsMsg, err := m.Impl.Post(&proto.ArgumentsMsg{})
+	argsMsg, err := m.Impl.Post(req)
 	//TODO: Turn shared Arguments into proto ArgumentsMsg
 	return argsMsg, err
 }

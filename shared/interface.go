@@ -64,7 +64,7 @@ func (p *ArgumentsPlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) 
 		logger: hclog.New(&hclog.LoggerOptions{
 			Level:  hclog.Trace,
 			Output: os.Stderr,
-			Name:   "ArgumentsServer",
+			Name:   "ArgumentsServer2",
 		}),
 	})
 	return nil
