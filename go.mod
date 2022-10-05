@@ -7,8 +7,8 @@ replace github.com/catdevman/awsume-go/proto => ./proto
 replace github.com/catdevman/awsume-go/shared => ./shared
 
 require (
-	github.com/catdevman/awsume-go/proto v0.0.0-20220815014318-c8bba163142a
-	github.com/catdevman/awsume-go/shared v0.0.0-20220815014318-c8bba163142a
+	github.com/catdevman/awsume-go/proto v0.0.0-20220815020950-6854acca229d
+	github.com/catdevman/awsume-go/shared v0.0.0-20220815020950-6854acca229d
 	github.com/hashicorp/go-hclog v1.2.2
 	github.com/hashicorp/go-plugin v1.4.4
 	github.com/spf13/cobra v1.5.0
