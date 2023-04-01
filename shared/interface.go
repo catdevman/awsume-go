@@ -77,7 +77,8 @@ func (p *ArgumentsPlugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBro
 			Level:  hclog.Trace,
 			Output: os.Stderr,
 			Name:   "ArgumentsClient",
-		})}, nil
+		}),
+	}, nil
 }
 
 // This is the implementation of plugin.GRPCPlugin so we can serve/consume this.

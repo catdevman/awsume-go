@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 Lucas Pearson <catdevman@gmail.com>
-
 */
 package cmd
 
@@ -9,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -20,10 +20,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
-var plugins []*plugin.Client
-var profiles shared.Profiles
-var logger hclog.Logger
+var (
+	cfgFile  string
+	plugins  []*plugin.Client
+	profiles shared.Profiles
+	logger   hclog.Logger
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -71,7 +73,7 @@ func init() {
 		client := plugin.NewClient(&plugin.ClientConfig{
 			HandshakeConfig:  shared.Handshake,
 			Plugins:          shared.PluginMap,
-			Cmd:              exec.Command("sh", "-c", filename), //TODO: This seems heavy handed can we load these paths from the conf file
+			Cmd:              exec.Command("sh", "-c", filename), // TODO: This seems heavy handed can we load these paths from the conf file
 			AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
 			Logger:           logger,
 		})
@@ -136,9 +138,23 @@ func handleArgs(plugs []*plugin.Client) {
 		}
 		argsplugin := raw.(shared.ArgumentsService)
 		args, err := argsplugin.Get()
-		logger.Debug(fmt.Sprint("root Args get", args, err))
+		// TODO: handle err from rpc call
+		// TODO: handle if plugins have the same flag
+		for _, a := range args.Arguments {
+			switch a.Type {
+			case "string":
+				rootCmd.PersistentFlags().String(a.Name, a.Value, a.Flag)
+			case "int", "int32", "int64":
+				// TODO: handle err when converting string to int
+				v, _ := strconv.Atoi(a.Value)
+				rootCmd.PersistentFlags().Int(a.Name, v, a.Flag)
+			case "bool":
+				// TODO: handle error when converting string to bool
+				v, _ := strconv.ParseBool(a.Value)
+				rootCmd.PersistentFlags().Bool(a.Name, v, a.Flag)
+			}
+		}
 	}
-
 }
 
 func handlePostArgs(plugs []*plugin.Client) {
@@ -278,6 +294,7 @@ func handlePostGetCredentials(plugs []*plugin.Client) {
 		profileplugin.Post()
 	}
 }
+
 func getProfileNames(plugs []*plugin.Client) {
 	for _, p := range plugs {
 		client, err := p.Client()
