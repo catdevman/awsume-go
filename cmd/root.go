@@ -210,14 +210,17 @@ func handleCollectProfiles(plugs []*plugin.Client) {
 			continue
 		}
 		profileplugin := raw.(shared.ProfilesService)
-		prs, err := profileplugin.Get()
+		profileMsg, err := profileplugin.Get()
 		if err != nil {
 			continue
 		}
 		if profiles == nil {
 			profiles = shared.Profiles{}
 		}
-		profiles = profiles.Add(prs)
+		for _, p := range profileMsg.Profiles {
+			fmt.Println(p)
+			// profiles = profiles.Add(prs)
+		}
 	}
 }
 
@@ -234,7 +237,17 @@ func handlePostCollectProfiles(plugs []*plugin.Client) {
 			continue
 		}
 		profileplugin := raw.(shared.ProfilesService)
-		profileplugin.Post(profiles)
+		// profileplugin.Post(profiles)
+		profileplugin.Post(&proto.ProfilesMsg{
+			Profiles: []*proto.Profile{
+				{
+					RoleArn:            "aws:arn:iam:thing",
+					AwsAccessKeyId:     "fake",
+					AwsAccessKeySecret: "fake",
+					Region:             "us-east-1",
+				},
+			},
+		})
 	}
 }
 

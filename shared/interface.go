@@ -15,7 +15,7 @@ var Handshake = plugin.HandshakeConfig{
 	// This isn't required when using VersionedPlugins
 	ProtocolVersion:  1,
 	MagicCookieKey:   "BASIC_PLUGIN",
-	MagicCookieValue: "hello",
+	MagicCookieValue: "awsume",
 }
 
 // PluginMap is the map of plugins we can dispense.
@@ -34,8 +34,8 @@ type ArgumentsService interface {
 
 type ProfilesService interface {
 	Pre() error
-	Get() (Profiles, error)
-	Post(Profiles) error
+	Get() (*proto.ProfilesMsg, error)
+	Post(*proto.ProfilesMsg) error
 }
 
 type CredentialsService interface {

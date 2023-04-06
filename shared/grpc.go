@@ -55,7 +55,7 @@ func (m *ArgumentsServer) Get(ctx context.Context, req *proto.Empty) (*proto.Arg
 
 func (m *ArgumentsServer) Post(ctx context.Context, req *proto.ArgumentsMsg) (*proto.ArgumentsMsg, error) {
 	argsMsg, err := m.Impl.Post(req)
-	//TODO: Turn shared Arguments into proto ArgumentsMsg
+	// TODO: Turn shared Arguments into proto ArgumentsMsg
 	return argsMsg, err
 }
 
@@ -67,16 +67,16 @@ func (m *ProfilesClient) Pre() error {
 	return err
 }
 
-func (m *ProfilesClient) Get() (Profiles, error) {
+func (m *ProfilesClient) Get() (*proto.ProfilesMsg, error) {
 	_, err := m.client.Get(context.Background(), &proto.Empty{})
 	if err != nil {
-		return Profiles{}, err
+		return &proto.ProfilesMsg{}, err
 	}
 
-	return Profiles{}, nil
+	return &proto.ProfilesMsg{}, nil
 }
 
-func (m *ProfilesClient) Post(p Profiles) error {
+func (m *ProfilesClient) Post(p *proto.ProfilesMsg) error {
 	_, err := m.client.Post(context.Background(), &proto.ProfilesMsg{})
 	if err != nil {
 		return err
@@ -94,21 +94,24 @@ type ProfilesServer struct {
 
 func (m *ProfilesServer) Pre(
 	ctx context.Context,
-	req *proto.Empty) (*proto.Empty, error) {
+	req *proto.Empty,
+) (*proto.Empty, error) {
 	return &proto.Empty{}, m.Impl.Pre()
 }
 
 func (m *ProfilesServer) Get(
 	ctx context.Context,
-	req *proto.Empty) (*proto.ProfilesMsg, error) {
+	req *proto.Empty,
+) (*proto.ProfilesMsg, error) {
 	_, err := m.Impl.Get()
 	return &proto.ProfilesMsg{}, err
 }
 
 func (m *ProfilesServer) Post(
 	ctx context.Context,
-	req *proto.ProfilesMsg) (*proto.Empty, error) {
-	err := m.Impl.Post(Profiles{})
+	req *proto.ProfilesMsg,
+) (*proto.Empty, error) {
+	err := m.Impl.Post(&proto.ProfilesMsg{})
 	return &proto.Empty{}, err
 }
 
@@ -147,19 +150,22 @@ type CredentialsServer struct {
 
 func (m *CredentialsServer) Pre(
 	ctx context.Context,
-	req *proto.Empty) (*proto.Empty, error) {
+	req *proto.Empty,
+) (*proto.Empty, error) {
 	return &proto.Empty{}, m.Impl.Pre()
 }
 
 func (m *CredentialsServer) Get(
 	ctx context.Context,
-	req *proto.Empty) (*proto.Empty, error) {
+	req *proto.Empty,
+) (*proto.Empty, error) {
 	return &proto.Empty{}, m.Impl.Get()
 }
 
 func (m *CredentialsServer) Post(
 	ctx context.Context,
-	req *proto.Empty) (*proto.Empty, error) {
+	req *proto.Empty,
+) (*proto.Empty, error) {
 	return &proto.Empty{}, m.Impl.Post()
 }
 
@@ -184,6 +190,7 @@ type ProfileNamesServer struct {
 
 func (m *ProfileNamesServer) Get(
 	ctx context.Context,
-	req *proto.Empty) (*proto.Empty, error) {
+	req *proto.Empty,
+) (*proto.Empty, error) {
 	return &proto.Empty{}, m.Impl.Get()
 }
